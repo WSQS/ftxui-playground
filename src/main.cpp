@@ -37,7 +37,24 @@ int main() {
         return window(text(L" Summary "), content);
     };
     auto value = 50;
-    auto btn_dec_01 = Button("-1", [&value] { value = rand()%50; }, Style());
+    std::vector<std::string> entries = {
+        "entry 1",
+        "entry 2",
+        "entry 3",
+    };
+    int selected = 0;
+
+    MenuOption option;
+    // option.on_enter = screen.ExitLoopClosure();
+    auto menu = Menu(&entries, &selected, MenuOption::Horizontal());
+    auto btn_dec_01 = Button("-1", [&value,&menu] {
+        value = rand() % 50;
+    }, Style());
+    auto btn_dec_02 = Button("-1", [&value,&menu,&entries] {
+        value = rand() % 50;
+        entries.push_back(std::to_string(value));
+        // menu->Add(Button("-2",[]{}));
+    }, Style());
     // auto btn_dec_02 = Button("+1", [&value] { value += 1; }, Style());
     auto document = //
             vbox({
@@ -49,12 +66,14 @@ int main() {
                 summary(),
                 summary(),
             });
-    auto buttons = Container::Horizontal({btn_dec_01});//, btn_dec_02});
-    auto component = Renderer(buttons, [&value,buttons] {
+    auto buttons = Container::Horizontal({btn_dec_02});
+
+    auto component = Renderer(buttons, [&value,&buttons,&menu] {
         return vbox({
-                   hbox(text(std::to_string(value)),separator(),gauge(value / 50.f)),
+                   hbox(text(std::to_string(value)), separator(), gauge(value / 50.f)),
                    separator(),
                    buttons->Render() | flex,
+                    menu->Render() | flex,
                }) |
                flex | border;
     });
