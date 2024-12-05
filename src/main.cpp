@@ -158,7 +158,7 @@ main()
                 input->Render(),
                 separator(),
                 // buttons->Render () | flex,
-                menu->Render() | flex,
+                menu->Render() |yframe,
             }) |
             flex | border;
     });
