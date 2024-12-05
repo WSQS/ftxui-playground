@@ -51,18 +51,47 @@ main()
 
     MenuOption option = MenuOption::Vertical();
     auto screen = ScreenInteractive::Fullscreen();
-    std::filesystem::path directoryPath = "/mnt/c";
-    option.on_enter = [&]
+    std::string directoryPath = "/mnt/c";
+    auto func = [&]
     {
-        std::cout << '\0' << std::endl;
-        directoryPath.append(entries[selected]);
-        // entries.clear();
-        entries = {".."};
-        for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
+        std::filesystem::path directory{directoryPath};
+        directory = directory.append(entries[selected]).lexically_normal();
+        directoryPath = directory;
+        if (directory.root_directory() == directoryPath)
         {
-            entries.push_back(entry.path().filename());
+            entries.clear();
+        }
+        else
+        {
+            entries = {".."};
+        }
+        if (is_directory(directory))
+        {
+            for (const auto& entry : std::filesystem::directory_iterator(directory))
+            {
+                entries.push_back(entry.path().filename());
+            }
+        }
+        else
+        {
+            auto command = std::string("code ") + directory.string();
+            std::filesystem::path temp_directory{directoryPath};
+            directory = directory.append("..").lexically_normal();
+            directoryPath = directory;
+            for (const auto& entry : std::filesystem::directory_iterator(directory))
+            {
+                entries.push_back(entry.path().filename());
+            }
+            std::thread commandThread{
+                [command]()
+                {
+                    std::system(command.c_str());
+                }
+            };
+            commandThread.detach();
         }
     };
+    option.on_enter = func;
     auto menu = Menu(&entries, &selected, option);
     for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
     {
@@ -90,11 +119,43 @@ main()
             summary(),
         });
     // auto buttons = Container::Horizontal ({ btn_dec_02 });
-
-    auto component = Renderer(menu, [&]
+    InputOption input_option{};
+    input_option.multiline = false;
+    input_option.on_enter = [&]
+    {
+        if (!std::filesystem::exists(directoryPath))
+        {
+            directoryPath = "/";
+        }
+        std::filesystem::path directory{directoryPath};
+        if (directory.root_directory() == directoryPath)
+        {
+            entries.clear();
+        }
+        else
+        {
+            entries = {".."};
+        }
+        if (is_regular_file(directory))
+        {
+            for (const auto& entry : std::filesystem::directory_iterator(directory))
+            {
+                entries.push_back(entry.path().filename());
+            }
+        }
+        else
+        {
+            directoryPath = std::string("code ") + directory.string();
+            entries.push_back(directoryPath);
+            std::system(directoryPath.c_str());
+        }
+    };
+    auto input = Input(&directoryPath, input_option);
+    auto container = Container::Vertical({input, menu});
+    auto component = Renderer(container, [&]
     {
         return vbox({
-                text(entries[selected]),
+                input->Render(),
                 separator(),
                 // buttons->Render () | flex,
                 menu->Render() | flex,
@@ -109,6 +170,6 @@ main()
     //
     // std::cout << screen.ToString() << '\0' << std::endl;
 
-    screen.Loop(menu);
+    screen.Loop(component);
     return EXIT_SUCCESS;
 }
