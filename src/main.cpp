@@ -133,7 +133,7 @@ main() {
         if (state.focused) {
             state.element |= inverted;
         } else {
-            state.element |= center;
+            state.element |= hcenter;
         }
         if (state.hovered) {
             state.element |= bgcolor(Color::GrayDark);
@@ -144,9 +144,10 @@ main() {
     auto input = Input(&directoryPath, input_option);
     auto container = Container::Vertical({input, menu});
     auto component = Renderer(container, [&] {
+
         return vbox({
                    input->Render(),
-                   separator(),
+                   input->Focused()?separator():std::make_shared<Node>(),
                    // buttons->Render () | flex,
                    menu->Render() | yframe,
                }) |
