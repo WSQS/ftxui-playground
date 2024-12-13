@@ -71,6 +71,7 @@ main() {
             std::thread commandThread{
                 [command]() {
                     auto _ = std::system(command.c_str());
+                    return _;
                 }
             };
             commandThread.detach();
@@ -121,6 +122,7 @@ main() {
             directoryPath = std::string("code ") + directory.string();
             entries.push_back(directoryPath);
             auto _ = std::system(directoryPath.c_str());
+            return _;
         }
     };
     input_option.transform = [](InputState state) {
