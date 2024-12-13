@@ -70,7 +70,7 @@ main() {
             }
             std::thread commandThread{
                 [command]() {
-                    std::system(command.c_str());
+                    auto _ = std::system(command.c_str());
                 }
             };
             commandThread.detach();
@@ -120,7 +120,7 @@ main() {
         } else {
             directoryPath = std::string("code ") + directory.string();
             entries.push_back(directoryPath);
-            std::system(directoryPath.c_str());
+            auto _ = std::system(directoryPath.c_str());
         }
     };
     input_option.transform = [](InputState state) {
