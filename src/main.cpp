@@ -124,6 +124,7 @@ main() {
             auto _ = std::system(directoryPath.c_str());
             return _;
         }
+        return 0;
     };
     input_option.transform = [](InputState state) {
         state.element |= color(Color::White);
