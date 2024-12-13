@@ -43,6 +43,11 @@ int main() {
             input_path_data.directory_path = "/";
         }
     };
+    auto get_directory_content = [](path_data &input_path_data) {
+        for (const auto &entry: std::filesystem::directory_iterator(input_path_data.directory_path)) {
+            input_path_data.entries.push_back(entry.path().filename());
+        }
+    };
     // handel menu enter
     menu_option.on_enter = [&] {
         handle_path_existence(input_data);
@@ -51,17 +56,13 @@ int main() {
         input_data.directory_path = directory;
         check_parent_sign(input_data);
         if (is_directory(directory)) {
-            for (const auto &entry: std::filesystem::directory_iterator(directory)) {
-                input_data.entries.push_back(entry.path().filename());
-            }
+            get_directory_content(input_data);
         } else {
             auto command = std::string("code ") + directory.string();
             std::filesystem::path temp_directory{input_data.directory_path};
             directory = directory.append("..").lexically_normal();
             input_data.directory_path = directory;
-            for (const auto &entry: std::filesystem::directory_iterator(directory)) {
-                input_data.entries.push_back(entry.path().filename());
-            }
+            get_directory_content(input_data);
             std::thread commandThread{
                 [command]() {
                     auto _ = std::system(command.c_str());
@@ -86,9 +87,8 @@ int main() {
                 input_data.entries.push_back(entry.path().filename());
             }
         } else {
-            input_data.directory_path = std::string("code ") + directory.string();
             input_data.entries.push_back(input_data.directory_path);
-            auto _ = std::system(input_data.directory_path.c_str());
+            auto _ = std::system((std::string("code ") +input_data.directory_path).c_str());
             return _;
         }
         return 0;
