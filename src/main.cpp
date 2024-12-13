@@ -9,8 +9,7 @@
 
 using namespace ftxui;
 
-ButtonOption
-Style() {
+ButtonOption Style() {
     auto option = ButtonOption::Animated(Color::Red, Color::Black, Color::Black, Color::White);
     option.transform = [](const EntryState &s) {
         auto element = text(s.label);
@@ -22,34 +21,37 @@ Style() {
     return option;
 }
 
-int
-main() {
+struct path_input_data {
+    std::string directory_path;
+    std::vector<std::string> entries;
+};
+
+int main() {
     using namespace ftxui;
-    std::vector<std::string> entries{".."};
+    path_input_data input_data{"/home/sophomore", {".."}};
     int selected = 0;
     MenuOption option = MenuOption::Vertical();
     auto screen = ScreenInteractive::Fullscreen();
-    std::string directoryPath = "/home/sophomore";
     auto func = [&] {
-        std::filesystem::path directory{directoryPath};
-        directory = directory.append(entries[selected]).lexically_normal();
-        directoryPath = directory;
-        if (directory.root_directory() == directoryPath) {
-            entries.clear();
+        std::filesystem::path directory{input_data.directory_path};
+        directory = directory.append(input_data.entries[selected]).lexically_normal();
+        input_data.directory_path = directory;
+        if (directory.root_directory() == input_data.directory_path) {
+            input_data.entries.clear();
         } else {
-            entries = {".."};
+            input_data.entries = {".."};
         }
         if (is_directory(directory)) {
             for (const auto &entry: std::filesystem::directory_iterator(directory)) {
-                entries.push_back(entry.path().filename());
+                input_data.entries.push_back(entry.path().filename());
             }
         } else {
             auto command = std::string("code ") + directory.string();
-            std::filesystem::path temp_directory{directoryPath};
+            std::filesystem::path temp_directory{input_data.directory_path};
             directory = directory.append("..").lexically_normal();
-            directoryPath = directory;
+            input_data.directory_path = directory;
             for (const auto &entry: std::filesystem::directory_iterator(directory)) {
-                entries.push_back(entry.path().filename());
+                input_data.entries.push_back(entry.path().filename());
             }
             std::thread commandThread{
                 [command]() {
@@ -61,30 +63,30 @@ main() {
         }
     };
     option.on_enter = func;
-    auto menu = Menu(&entries, &selected, option);
-    for (const auto &entry: std::filesystem::directory_iterator(directoryPath)) {
-        entries.push_back(entry.path().filename());
+    auto menu = Menu(&input_data.entries, &selected, option);
+    for (const auto &entry: std::filesystem::directory_iterator(input_data.directory_path)) {
+        input_data.entries.push_back(entry.path().filename());
     }
     InputOption input_option{};
     input_option.multiline = false;
     input_option.on_enter = [&] {
-        if (!std::filesystem::exists(directoryPath)) {
-            directoryPath = "/";
+        if (!std::filesystem::exists(input_data.directory_path)) {
+            input_data.directory_path = "/";
         }
-        std::filesystem::path directory{directoryPath};
-        if (directory.root_directory() == directoryPath) {
-            entries.clear();
+        std::filesystem::path directory{input_data.directory_path};
+        if (directory.root_directory() == input_data.directory_path) {
+            input_data.entries.clear();
         } else {
-            entries = {".."};
+            input_data.entries = {".."};
         }
         if (is_regular_file(directory)) {
             for (const auto &entry: std::filesystem::directory_iterator(directory)) {
-                entries.push_back(entry.path().filename());
+                input_data.entries.push_back(entry.path().filename());
             }
         } else {
-            directoryPath = std::string("code ") + directory.string();
-            entries.push_back(directoryPath);
-            auto _ = std::system(directoryPath.c_str());
+            input_data.directory_path = std::string("code ") + directory.string();
+            input_data.entries.push_back(input_data.directory_path);
+            auto _ = std::system(input_data.directory_path.c_str());
             return _;
         }
         return 0;
@@ -107,7 +109,7 @@ main() {
 
         return state.element;
     };
-    auto input = Input(&directoryPath, input_option);
+    auto input = Input(&input_data.directory_path, input_option);
     auto container = Container::Vertical({input, menu});
     auto component = Renderer(container, [&] {
         return vbox({
