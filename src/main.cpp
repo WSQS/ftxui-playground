@@ -48,6 +48,11 @@ int main() {
             input_path_data.entries.push_back(entry.path().filename());
         }
     };
+    auto get_parent_directory = [](path_data &input_path_data) {
+        std::filesystem::path temp_directory{input_path_data.directory_path};
+        temp_directory = temp_directory.append("..").lexically_normal();
+        input_path_data.directory_path = temp_directory;
+    };
     // handel menu enter
     menu_option.on_enter = [&] {
         handle_path_existence(input_data);
@@ -55,13 +60,11 @@ int main() {
         directory = directory.append(input_data.entries[input_data.selected]).lexically_normal();
         input_data.directory_path = directory;
         check_parent_sign(input_data);
-        if (is_directory(directory)) {
+        if (status(directory).type() == std::filesystem::file_type::directory)
             get_directory_content(input_data);
-        } else {
+        else if (status(directory).type() == std::filesystem::file_type::regular) {
             auto command = std::string("code ") + directory.string();
-            std::filesystem::path temp_directory{input_data.directory_path};
-            directory = directory.append("..").lexically_normal();
-            input_data.directory_path = directory;
+            get_parent_directory(input_data);
             get_directory_content(input_data);
             std::thread commandThread{
                 [command]() {
@@ -82,13 +85,12 @@ int main() {
         handle_path_existence(input_data);
         check_parent_sign(input_data);
         std::filesystem::path directory{input_data.directory_path};
-        if (is_regular_file(directory)) {
-            for (const auto &entry: std::filesystem::directory_iterator(directory)) {
-                input_data.entries.push_back(entry.path().filename());
-            }
-        } else {
-            input_data.entries.push_back(input_data.directory_path);
-            auto _ = std::system((std::string("code ") +input_data.directory_path).c_str());
+        if (status(directory).type() == std::filesystem::file_type::directory)
+            get_directory_content(input_data);
+        else if (status(directory).type() == std::filesystem::file_type::regular) {
+            auto _ = std::system((std::string("code ") + input_data.directory_path).c_str());
+            get_parent_directory(input_data);
+            get_directory_content(input_data);
             return _;
         }
         return 0;
