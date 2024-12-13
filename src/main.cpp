@@ -32,15 +32,20 @@ int main() {
     path_data input_data{"/home/sophomore", {".."}};
     auto screen = ScreenInteractive::Fullscreen();
     MenuOption menu_option = MenuOption::Vertical();
-    auto check_parent_sign = [](path_data & input_path_data) {
-        if (std::filesystem::path(input_path_data.directory_path).root_directory() == input_path_data.directory_path) {
+    auto check_parent_sign = [](path_data &input_path_data) {
+        if (std::filesystem::path(input_path_data.directory_path).root_directory() == input_path_data.directory_path)
             input_path_data.entries.clear();
-        } else {
+        else
             input_path_data.entries = {".."};
+    };
+    auto handle_path_existence = [](path_data &input_path_data) {
+        if (!std::filesystem::exists(input_path_data.directory_path)) {
+            input_path_data.directory_path = "/";
         }
     };
     // handel menu enter
     menu_option.on_enter = [&] {
+        handle_path_existence(input_data);
         std::filesystem::path directory{input_data.directory_path};
         directory = directory.append(input_data.entries[input_data.selected]).lexically_normal();
         input_data.directory_path = directory;
@@ -73,11 +78,9 @@ int main() {
     InputOption input_option{};
     input_option.multiline = false;
     input_option.on_enter = [&] {
-        if (!std::filesystem::exists(input_data.directory_path)) {
-            input_data.directory_path = "/";
-        }
-        std::filesystem::path directory{input_data.directory_path};
+        handle_path_existence(input_data);
         check_parent_sign(input_data);
+        std::filesystem::path directory{input_data.directory_path};
         if (is_regular_file(directory)) {
             for (const auto &entry: std::filesystem::directory_iterator(directory)) {
                 input_data.entries.push_back(entry.path().filename());
