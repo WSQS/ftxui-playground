@@ -21,26 +21,30 @@ ButtonOption Style() {
     return option;
 }
 
-struct path_input_data {
-    std::string directory_path;
-    std::vector<std::string> entries;
+struct path_data {
+    std::string directory_path{};
+    std::vector<std::string> entries{};
+    int selected = 0;
 };
 
 int main() {
     using namespace ftxui;
-    path_input_data input_data{"/home/sophomore", {".."}};
-    int selected = 0;
-    MenuOption option = MenuOption::Vertical();
+    path_data input_data{"/home/sophomore", {".."}};
     auto screen = ScreenInteractive::Fullscreen();
-    auto func = [&] {
-        std::filesystem::path directory{input_data.directory_path};
-        directory = directory.append(input_data.entries[selected]).lexically_normal();
-        input_data.directory_path = directory;
-        if (directory.root_directory() == input_data.directory_path) {
-            input_data.entries.clear();
+    MenuOption menu_option = MenuOption::Vertical();
+    auto check_parent_sign = [](path_data & input_path_data) {
+        if (std::filesystem::path(input_path_data.directory_path).root_directory() == input_path_data.directory_path) {
+            input_path_data.entries.clear();
         } else {
-            input_data.entries = {".."};
+            input_path_data.entries = {".."};
         }
+    };
+    // handel menu enter
+    menu_option.on_enter = [&] {
+        std::filesystem::path directory{input_data.directory_path};
+        directory = directory.append(input_data.entries[input_data.selected]).lexically_normal();
+        input_data.directory_path = directory;
+        check_parent_sign(input_data);
         if (is_directory(directory)) {
             for (const auto &entry: std::filesystem::directory_iterator(directory)) {
                 input_data.entries.push_back(entry.path().filename());
@@ -62,8 +66,7 @@ int main() {
             commandThread.detach();
         }
     };
-    option.on_enter = func;
-    auto menu = Menu(&input_data.entries, &selected, option);
+    auto menu = Menu(&input_data.entries, &input_data.selected, menu_option);
     for (const auto &entry: std::filesystem::directory_iterator(input_data.directory_path)) {
         input_data.entries.push_back(entry.path().filename());
     }
@@ -74,11 +77,7 @@ int main() {
             input_data.directory_path = "/";
         }
         std::filesystem::path directory{input_data.directory_path};
-        if (directory.root_directory() == input_data.directory_path) {
-            input_data.entries.clear();
-        } else {
-            input_data.entries = {".."};
-        }
+        check_parent_sign(input_data);
         if (is_regular_file(directory)) {
             for (const auto &entry: std::filesystem::directory_iterator(directory)) {
                 input_data.entries.push_back(entry.path().filename());
@@ -93,11 +92,9 @@ int main() {
     };
     input_option.transform = [](InputState state) {
         state.element |= color(Color::White);
-
         if (state.is_placeholder) {
             state.element |= dim;
         }
-
         if (state.focused) {
             state.element |= inverted;
         } else {
@@ -106,7 +103,6 @@ int main() {
         if (state.hovered) {
             state.element |= bgcolor(Color::GrayDark);
         }
-
         return state.element;
     };
     auto input = Input(&input_data.directory_path, input_option);
