@@ -147,10 +147,9 @@ main() {
     auto input = Input(&directoryPath, input_option);
     auto container = Container::Vertical({input, menu});
     auto component = Renderer(container, [&] {
-
         return vbox({
                    input->Render(),
-                   input->Focused()?separator():std::make_shared<Node>(),
+                   separator(),
                    // buttons->Render () | flex,
                    menu->Render() | yframe,
                }) |
