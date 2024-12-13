@@ -30,6 +30,11 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+    - name: Upload binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: ftxui-playground
+        path: ${{github.workspace}}/build/ftxui-starter
 
     # - name: Test
     #   working-directory: ${{github.workspace}}/build
