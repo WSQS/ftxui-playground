@@ -34,7 +34,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ftxui-playground
-        path: ${{github.workspace}}/build/ftxui-starter
+        path: ${{github.workspace}}/build/ftxui-playground
 
     # - name: Test
     #   working-directory: ${{github.workspace}}/build
