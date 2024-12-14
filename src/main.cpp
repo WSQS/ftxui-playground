@@ -69,10 +69,16 @@ int main() {
     };
     constexpr auto handel_file_type = [get_directory_content,handel_file](path_data &input_path_data) {
         std::filesystem::path directory{input_path_data.directory_path};
-        if (status(directory).type() == std::filesystem::file_type::directory)
-            get_directory_content(input_path_data);
-        else if (status(directory).type() == std::filesystem::file_type::regular)
-            handel_file(input_path_data);
+        switch (status(directory).type()) {
+            case std::filesystem::file_type::directory:
+                get_directory_content(input_path_data);
+                break;
+            case std::filesystem::file_type::regular:
+                handel_file(input_path_data);
+                break;
+            default:
+                input_path_data.log = "Unsupported file type";
+        }
     };
     // handel menu enter
     menu_option.on_enter = [&]() {
@@ -117,7 +123,7 @@ int main() {
                    input->Render(),
                    separator(),
                    // buttons->Render () | flex,
-                   menu->Render() | yframe| yflex,// the flex is necessary for log to display
+                   menu->Render() | yframe | yflex, // the flex is necessary for log to display
                    text(input_data.log) | border
                    // input_data.log.size() ? text(input_data.log) : std::make_shared<Node>()
                }) | flex | border;
