@@ -46,13 +46,13 @@ int main() {
     };
     constexpr auto get_directory_content = [](path_data &input_path_data) {
         for (const auto &entry: std::filesystem::directory_iterator(input_path_data.directory_path)) {
-            input_path_data.entries.push_back(entry.path().filename());
+            input_path_data.entries.push_back(entry.path().filename().string());
         }
     };
     constexpr auto get_parent_directory = [](path_data &input_path_data) {
         std::filesystem::path temp_directory{input_path_data.directory_path};
         temp_directory = temp_directory.append("..").lexically_normal();
-        input_path_data.directory_path = temp_directory;
+        input_path_data.directory_path = temp_directory.string();
     };
     constexpr auto run_command = [](path_data &input_path_data) {
         std::thread commandThread{
@@ -79,13 +79,13 @@ int main() {
         handle_path_existence(input_data);
         std::filesystem::path directory{input_data.directory_path};
         directory = directory.append(input_data.entries[input_data.selected]).lexically_normal();
-        input_data.directory_path = directory;
+        input_data.directory_path = directory.string();
         check_parent_sign(input_data);
         handel_file_type(input_data);
     };
     auto menu = Menu(&input_data.entries, &input_data.selected, menu_option);
     for (const auto &entry: std::filesystem::directory_iterator(input_data.directory_path)) {
-        input_data.entries.push_back(entry.path().filename());
+        input_data.entries.push_back(entry.path().filename().string());
     }
     InputOption input_option{};
     input_option.multiline = false;
