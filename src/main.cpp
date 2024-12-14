@@ -62,17 +62,17 @@ int main() {
         };
         commandThread.detach();
     };
-    auto handel_file = [&](path_data &input_path_data) {
+    constexpr auto handel_file = [run_command,get_parent_directory,get_directory_content](path_data &input_path_data) {
         run_command(input_path_data);
         get_parent_directory(input_path_data);
         get_directory_content(input_path_data);
     };
-    auto handel_file_type = [&](path_data &input_path_data) {
+    constexpr auto handel_file_type = [get_directory_content,handel_file](path_data &input_path_data) {
         std::filesystem::path directory{input_path_data.directory_path};
         if (status(directory).type() == std::filesystem::file_type::directory)
-            get_directory_content(input_data);
+            get_directory_content(input_path_data);
         else if (status(directory).type() == std::filesystem::file_type::regular)
-            handel_file(input_data);
+            handel_file(input_path_data);
     };
     // handel menu enter
     menu_option.on_enter = [&] {
