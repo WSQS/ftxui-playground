@@ -80,6 +80,12 @@ int main() {
                 input_path_data.log = "Unsupported file type";
         }
     };
+    constexpr auto build_log = [](path_data &input_path_data) {
+        if (input_path_data.log.size()!=0)
+            return text(input_path_data.log) | border;
+        else
+            return std::make_shared<Node>();
+    };
     // handel menu enter
     menu_option.on_enter = [&]() {
         handle_path_existence(input_data);
@@ -124,8 +130,7 @@ int main() {
                    separator(),
                    // buttons->Render () | flex,
                    menu->Render() | yframe | yflex, // the flex is necessary for log to display
-                   text(input_data.log) | border
-                   // input_data.log.size() ? text(input_data.log) : std::make_shared<Node>()
+                    build_log(input_data)
                }) | flex | border;
     });
     // Limit the size of the document to 80 char.
