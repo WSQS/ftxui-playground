@@ -76,7 +76,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ matrix.c_compiler }}
-          path: ${{github.workspace}}/build/ftxui-playground
+          path: ${{ github.workspace }}/build/ftxui-playground${{matrix.os == 'windows-latest' && '.exe' || '' }}
 
     #      - name: Test
     #        working-directory: ${{ steps.strings.outputs.build-output-dir }}
