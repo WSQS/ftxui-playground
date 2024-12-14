@@ -75,7 +75,7 @@ int main() {
             handel_file(input_path_data);
     };
     // handel menu enter
-    menu_option.on_enter = [&] {
+    menu_option.on_enter = [&]() {
         handle_path_existence(input_data);
         std::filesystem::path directory{input_data.directory_path};
         directory = directory.append(input_data.entries[input_data.selected]).lexically_normal();
@@ -117,9 +117,10 @@ int main() {
                    input->Render(),
                    separator(),
                    // buttons->Render () | flex,
-                   menu->Render() | yframe,
-               }) |
-               flex | border;
+                   menu->Render() | yframe| yflex,// the flex is necessary for log to display
+                   text(input_data.log) | border
+                   // input_data.log.size() ? text(input_data.log) : std::make_shared<Node>()
+               }) | flex | border;
     });
     // Limit the size of the document to 80 char.
     // document = document; //| size(WIDTH, LESS_THAN, 80);
