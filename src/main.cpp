@@ -53,6 +53,13 @@ int main() {
         temp_directory = temp_directory.append("..").lexically_normal();
         input_path_data.directory_path = temp_directory;
     };
+    auto run_command = [](path_data &input_path_data) {
+        auto command = std::string("code ") + input_path_data.directory_path;
+        std::thread commandThread{[command = std::string("code ") + input_path_data.directory_path]() {
+            return std::system(command.c_str());
+        }};
+        commandThread.detach();
+    };
     // handel menu enter
     menu_option.on_enter = [&] {
         handle_path_existence(input_data);
@@ -63,16 +70,9 @@ int main() {
         if (status(directory).type() == std::filesystem::file_type::directory)
             get_directory_content(input_data);
         else if (status(directory).type() == std::filesystem::file_type::regular) {
-            auto command = std::string("code ") + directory.string();
+            run_command(input_data);
             get_parent_directory(input_data);
             get_directory_content(input_data);
-            std::thread commandThread{
-                [command]() {
-                    auto _ = std::system(command.c_str());
-                    return _;
-                }
-            };
-            commandThread.detach();
         }
     };
     auto menu = Menu(&input_data.entries, &input_data.selected, menu_option);
@@ -88,12 +88,10 @@ int main() {
         if (status(directory).type() == std::filesystem::file_type::directory)
             get_directory_content(input_data);
         else if (status(directory).type() == std::filesystem::file_type::regular) {
-            auto _ = std::system((std::string("code ") + input_data.directory_path).c_str());
+            run_command(input_data);
             get_parent_directory(input_data);
             get_directory_content(input_data);
-            return _;
         }
-        return 0;
     };
     input_option.transform = [](InputState state) {
         state.element |= color(Color::White);
