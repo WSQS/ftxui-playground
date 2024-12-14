@@ -32,33 +32,38 @@ int main() {
     path_data input_data{"/home/sophomore", {".."}};
     auto screen = ScreenInteractive::Fullscreen();
     MenuOption menu_option = MenuOption::Vertical();
-    auto check_parent_sign = [](path_data &input_path_data) {
+    constexpr auto check_parent_sign = [](path_data &input_path_data) {
         if (std::filesystem::path(input_path_data.directory_path).root_directory() == input_path_data.directory_path)
             input_path_data.entries.clear();
         else
             input_path_data.entries = {".."};
     };
-    auto handle_path_existence = [](path_data &input_path_data) {
+    constexpr auto handle_path_existence = [](path_data &input_path_data) {
         if (!std::filesystem::exists(input_path_data.directory_path)) {
             input_path_data.directory_path = "/";
         }
     };
-    auto get_directory_content = [](path_data &input_path_data) {
+    constexpr auto get_directory_content = [](path_data &input_path_data) {
         for (const auto &entry: std::filesystem::directory_iterator(input_path_data.directory_path)) {
             input_path_data.entries.push_back(entry.path().filename());
         }
     };
-    auto get_parent_directory = [](path_data &input_path_data) {
+    constexpr auto get_parent_directory = [](path_data &input_path_data) {
         std::filesystem::path temp_directory{input_path_data.directory_path};
         temp_directory = temp_directory.append("..").lexically_normal();
         input_path_data.directory_path = temp_directory;
     };
-    auto run_command = [](path_data &input_path_data) {
+    constexpr auto run_command = [](path_data &input_path_data) {
         auto command = std::string("code ") + input_path_data.directory_path;
         std::thread commandThread{[command = std::string("code ") + input_path_data.directory_path]() {
             return std::system(command.c_str());
         }};
         commandThread.detach();
+    };
+    auto handel_file = [&](path_data &input_path_data) {
+        run_command(input_path_data);
+        get_parent_directory(input_path_data);
+        get_directory_content(input_path_data);
     };
     // handel menu enter
     menu_option.on_enter = [&] {
@@ -70,9 +75,7 @@ int main() {
         if (status(directory).type() == std::filesystem::file_type::directory)
             get_directory_content(input_data);
         else if (status(directory).type() == std::filesystem::file_type::regular) {
-            run_command(input_data);
-            get_parent_directory(input_data);
-            get_directory_content(input_data);
+            handel_file(input_data);
         }
     };
     auto menu = Menu(&input_data.entries, &input_data.selected, menu_option);
@@ -88,9 +91,7 @@ int main() {
         if (status(directory).type() == std::filesystem::file_type::directory)
             get_directory_content(input_data);
         else if (status(directory).type() == std::filesystem::file_type::regular) {
-            run_command(input_data);
-            get_parent_directory(input_data);
-            get_directory_content(input_data);
+            handel_file(input_data);
         }
     };
     input_option.transform = [](InputState state) {
