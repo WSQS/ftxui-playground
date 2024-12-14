@@ -24,6 +24,7 @@ ButtonOption Style() {
 struct path_data {
     std::string directory_path{};
     std::vector<std::string> entries{};
+    std::string log{};
     int selected = 0;
 };
 
@@ -54,16 +55,24 @@ int main() {
         input_path_data.directory_path = temp_directory;
     };
     constexpr auto run_command = [](path_data &input_path_data) {
-        auto command = std::string("code ") + input_path_data.directory_path;
-        std::thread commandThread{[command = std::string("code ") + input_path_data.directory_path]() {
-            return std::system(command.c_str());
-        }};
+        std::thread commandThread{
+            [command = std::string("code ") + input_path_data.directory_path]() {
+                return std::system(command.c_str());
+            }
+        };
         commandThread.detach();
     };
     auto handel_file = [&](path_data &input_path_data) {
         run_command(input_path_data);
         get_parent_directory(input_path_data);
         get_directory_content(input_path_data);
+    };
+    auto handel_file_type = [&](path_data &input_path_data) {
+        std::filesystem::path directory{input_path_data.directory_path};
+        if (status(directory).type() == std::filesystem::file_type::directory)
+            get_directory_content(input_data);
+        else if (status(directory).type() == std::filesystem::file_type::regular)
+            handel_file(input_data);
     };
     // handel menu enter
     menu_option.on_enter = [&] {
@@ -72,11 +81,7 @@ int main() {
         directory = directory.append(input_data.entries[input_data.selected]).lexically_normal();
         input_data.directory_path = directory;
         check_parent_sign(input_data);
-        if (status(directory).type() == std::filesystem::file_type::directory)
-            get_directory_content(input_data);
-        else if (status(directory).type() == std::filesystem::file_type::regular) {
-            handel_file(input_data);
-        }
+        handel_file_type(input_data);
     };
     auto menu = Menu(&input_data.entries, &input_data.selected, menu_option);
     for (const auto &entry: std::filesystem::directory_iterator(input_data.directory_path)) {
@@ -88,11 +93,7 @@ int main() {
         handle_path_existence(input_data);
         check_parent_sign(input_data);
         std::filesystem::path directory{input_data.directory_path};
-        if (status(directory).type() == std::filesystem::file_type::directory)
-            get_directory_content(input_data);
-        else if (status(directory).type() == std::filesystem::file_type::regular) {
-            handel_file(input_data);
-        }
+        handel_file_type(input_data);
     };
     input_option.transform = [](InputState state) {
         state.element |= color(Color::White);
