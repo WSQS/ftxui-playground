@@ -36,6 +36,10 @@ target_link_libraries(ftxui-playground
 )
 
 set_target_properties(ftxui-playground PROPERTIES CXX_STANDARD 11)
-target_compile_options(ftxui-playground PRIVATE -Wall -Wextra -pedantic -Werror -W)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(ftxui-playground PRIVATE /W4 /WX)  # 启用高级别警告和错误
+else()
+    target_compile_options(ftxui-playground PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
 
 install(TARGETS ftxui-playground RUNTIME DESTINATION "bin")
