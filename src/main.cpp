@@ -7,48 +7,49 @@
 #include "ftxui/dom/elements.hpp"
 
 using namespace ftxui;
-
-ButtonOption Style() {
-    auto option = ButtonOption::Animated(Color::Red, Color::Black, Color::Black, Color::White);
-    option.transform = [](const EntryState &s) {
-        auto element = text(s.label);
-        if (s.focused) {
-            element |= bold;
-        }
-        return element | center | borderEmpty | flex;
-    };
-    return option;
-}
+using namespace playground;
+//
+// ButtonOption Style() {
+//     auto option = ButtonOption::Animated(Color::Red, Color::Black, Color::Black, Color::White);
+//     option.transform = [](const EntryState &s) {
+//         auto element = text(s.label);
+//         if (s.focused) {
+//             element |= bold;
+//         }
+//         return element | center | borderEmpty | flex;
+//     };
+//     return option;
+// }
 
 int main() {
     using namespace ftxui;
-    path_data input_data{"/home/sophomore", {".."}};
+
     auto screen = ScreenInteractive::Fullscreen();
-    MenuOption menu_option = MenuOption::Vertical();
     constexpr auto check_parent_sign = [](path_data &input_path_data) {
-        if (std::filesystem::path(input_path_data.directory_path).root_directory() == input_path_data.directory_path)
-            input_path_data.entries.clear();
+        if (std::filesystem::path(input_path_data.input.content).root_directory() == input_path_data.input.content)
+            input_path_data.menu.entries.clear();
         else
-            input_path_data.entries = {".."};
+            input_path_data.menu.entries = {".."};
     };
     constexpr auto handle_path_existence = [](path_data &input_path_data) {
-        if (!std::filesystem::exists(input_path_data.directory_path)) {
-            input_path_data.directory_path = "/";
+        if (!std::filesystem::exists(input_path_data.input.content)) {
+            input_path_data.input.content = "/";
+            input_path_data.log  = "Unavailable path";
         }
     };
     constexpr auto get_directory_content = [](path_data &input_path_data) {
-        for (const auto &entry: std::filesystem::directory_iterator(input_path_data.directory_path)) {
-            input_path_data.entries.push_back(entry.path().filename().string());
+        for (const auto &entry: std::filesystem::directory_iterator(input_path_data.input.content)) {
+            input_path_data.menu.entries.push_back(entry.path().filename().string());
         }
     };
     constexpr auto get_parent_directory = [](path_data &input_path_data) {
-        std::filesystem::path temp_directory{input_path_data.directory_path};
+        std::filesystem::path temp_directory{input_path_data.input.content};
         temp_directory = temp_directory.append("..").lexically_normal();
-        input_path_data.directory_path = temp_directory.string();
+        input_path_data.input.content = temp_directory.string();
     };
     constexpr auto run_command = [](path_data &input_path_data) {
         std::thread commandThread{
-            [command = std::string("code ") + input_path_data.directory_path]() {
+            [command = std::string("code ") + input_path_data.input.content]() {
                 return std::system(command.c_str());
             }
         };
@@ -60,7 +61,7 @@ int main() {
         get_directory_content(input_path_data);
     };
     constexpr auto handel_file_type = [get_directory_content,handel_file](path_data &input_path_data) {
-        std::filesystem::path directory{input_path_data.directory_path};
+        std::filesystem::path directory{input_path_data.input.content};
         switch (status(directory).type()) {
             case std::filesystem::file_type::directory:
                 get_directory_content(input_path_data);
@@ -78,25 +79,25 @@ int main() {
         else
             return std::make_shared<Node>();
     };
+    path_data input_data{{"/home/sophomore"}, {{".."}, {}, MenuOption::Vertical()}, };
+    MenuOption &menu_option = input_data.menu.option;
+    InputOption &input_option = input_data.input.option;
     // handel menu enter
     menu_option.on_enter = [&]() {
         handle_path_existence(input_data);
-        std::filesystem::path directory{input_data.directory_path};
-        directory = directory.append(input_data.entries[input_data.selected]).lexically_normal();
-        input_data.directory_path = directory.string();
+        std::filesystem::path directory{input_data.input.content};
+        directory = directory.append(input_data.menu.entries[input_data.menu.selected]).lexically_normal();
+        input_data.input.content = directory.string();
         check_parent_sign(input_data);
         handel_file_type(input_data);
     };
-    auto menu = Menu(&input_data.entries, &input_data.selected, menu_option);
-    for (const auto &entry: std::filesystem::directory_iterator(input_data.directory_path)) {
-        input_data.entries.push_back(entry.path().filename().string());
-    }
-    InputOption input_option{};
+    auto menu = input_data.menu.instantiate();
+    get_directory_content(input_data);
     input_option.multiline = false;
     input_option.on_enter = [&] {
         handle_path_existence(input_data);
         check_parent_sign(input_data);
-        std::filesystem::path directory{input_data.directory_path};
+        std::filesystem::path directory{input_data.input.content};
         handel_file_type(input_data);
     };
     input_option.transform = [](InputState state) {
@@ -114,7 +115,7 @@ int main() {
         }
         return state.element;
     };
-    auto input = Input(&input_data.directory_path, input_option);
+    auto input = input_data.input.instantiate();
     auto container = Container::Vertical({input, menu});
     auto component = Renderer(container, [&] {
         return vbox({
@@ -133,5 +134,7 @@ int main() {
     // std::cout << screen.ToString() << '\0' << std::endl;
 
     screen.Loop(component);
+    // auto foldermenu = folder_menu(input_data);
+    // screen.Loop(foldermenu);
     return EXIT_SUCCESS;
 }
