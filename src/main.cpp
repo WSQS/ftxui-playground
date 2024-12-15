@@ -1,11 +1,10 @@
-#include <iostream>
 #include <filesystem>
-#include <ftxui/dom/elements.hpp>
-#include "ftxui/component/screen_interactive.hpp"
-
+#include <iostream>
+#include "folder_menu.h"
 #include "ftxui/component/component.hpp"
-#include "ftxui/component/component_base.hpp"      // for ComponentBase
-
+#include "ftxui/component/component_base.hpp"
+#include "ftxui/component/screen_interactive.hpp"
+#include "ftxui/dom/elements.hpp"
 
 using namespace ftxui;
 
@@ -20,13 +19,6 @@ ButtonOption Style() {
     };
     return option;
 }
-
-struct path_data {
-    std::string directory_path{};
-    std::vector<std::string> entries{};
-    std::string log{};
-    int selected = 0;
-};
 
 int main() {
     using namespace ftxui;
@@ -81,7 +73,7 @@ int main() {
         }
     };
     constexpr auto build_log = [](path_data &input_path_data) {
-        if (input_path_data.log.size()!=0)
+        if (input_path_data.log.size() != 0)
             return text(input_path_data.log) | border;
         else
             return std::make_shared<Node>();
@@ -128,9 +120,8 @@ int main() {
         return vbox({
                    input->Render(),
                    separator(),
-                   // buttons->Render () | flex,
                    menu->Render() | yframe | yflex, // the flex is necessary for log to display
-                    build_log(input_data)
+                   build_log(input_data)
                }) | flex | border;
     });
     // Limit the size of the document to 80 char.
