@@ -116,11 +116,16 @@ int main() {
         return state.element;
     };
     auto input = input_data.input.instantiate();
-    auto container = Container::Vertical({input, menu}) | CatchEvent([&](Event event) {
+    auto container = Container::Vertical({input, menu}) | CatchEvent([&](const Event &event) {
         if (event.is_character()) {
             switch (event.character()[0]) {
                 case 'q':
                     screen.Exit();
+                    return true;
+                case 'c':
+                    return true;
+                default:
+                    break;
             }
         }
         return false;
