@@ -34,7 +34,7 @@ int main() {
     constexpr auto handle_path_existence = [](path_data &input_path_data) {
         if (!std::filesystem::exists(input_path_data.input.content)) {
             input_path_data.input.content = "/";
-            input_path_data.log  = "Unavailable path";
+            input_path_data.log = "Unavailable path";
         }
     };
     constexpr auto get_directory_content = [](path_data &input_path_data) {
@@ -79,7 +79,7 @@ int main() {
         else
             return std::make_shared<Node>();
     };
-    path_data input_data{{"/home/sophomore"}, {{".."}, {}, MenuOption::Vertical()}, };
+    path_data input_data{{"/home/sophomore"}, {{".."}, {}, MenuOption::Vertical()},};
     MenuOption &menu_option = input_data.menu.option;
     InputOption &input_option = input_data.input.option;
     // handel menu enter
@@ -116,7 +116,15 @@ int main() {
         return state.element;
     };
     auto input = input_data.input.instantiate();
-    auto container = Container::Vertical({input, menu});
+    auto container = Container::Vertical({input, menu}) | CatchEvent([&](Event event) {
+        if (event.is_character()) {
+            switch (event.character()[0]) {
+                case 'q':
+                    screen.Exit();
+            }
+        }
+        return false;
+    });
     auto component = Renderer(container, [&] {
         return vbox({
                    input->Render(),
