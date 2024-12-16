@@ -26,7 +26,7 @@ namespace playground {
         std::string content{};
         InputOption option{};
         Component instantiate() {
-            return Input(content,option);
+            return Input(&content,option);
         }
     };
 
