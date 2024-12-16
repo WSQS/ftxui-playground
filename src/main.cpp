@@ -10,15 +10,7 @@ using namespace ftxui;
 using namespace playground;
 
 int main() {
-    using namespace ftxui;
-
     auto screen = ScreenInteractive::Fullscreen();
-    constexpr auto check_parent_sign = [](path_data &input_path_data) {
-        if (std::filesystem::path(*input_path_data.input.content).root_directory() == *input_path_data.input.content)
-            (*input_path_data.menu.entries).clear();
-        else
-            *input_path_data.menu.entries = {".."};
-    };
     constexpr auto handle_path_existence = [](path_data &input_path_data) {
         if (!std::filesystem::exists(*input_path_data.input.content)) {
             input_path_data.input.content = "/";
@@ -83,7 +75,7 @@ int main() {
     // auto menu = Menu(input_data.menu.option);
     get_directory_content(input_data);
     input_option.multiline = false;
-    input_option.on_enter = [input_data,handle_path_existence,check_parent_sign,handel_file_type]() mutable {
+    input_option.on_enter = [input_data,handle_path_existence,handel_file_type]() mutable {
         handle_path_existence(input_data);
         check_parent_sign(input_data);
         std::filesystem::path directory{*input_data.input.content};
