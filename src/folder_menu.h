@@ -11,19 +11,19 @@ using namespace ftxui;
 
 namespace playground {
     struct menu_data {
-        std::vector<std::string> entries{};
-        int selected{};
+        Ref<std::vector<std::string>> entries{};
+        std::shared_ptr<int> selected{};
         MenuOption option{};
         Component instantiate(){
-            return Menu(&entries,&selected,option);
+            return Menu(&*entries,selected.get(),option);
         }
     };
 
     struct input_data{
-        std::string content{};
+        StringRef content{};
         InputOption option{};
         Component instantiate() {
-            return Input(&content,option);
+            return Input(content,option);
         }
     };
 
