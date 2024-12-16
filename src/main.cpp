@@ -13,7 +13,7 @@ int main() {
     using namespace ftxui;
 
     auto screen = ScreenInteractive::Fullscreen();
-        constexpr auto check_parent_sign = [](path_data &input_path_data) {
+    constexpr auto check_parent_sign = [](path_data &input_path_data) {
         if (std::filesystem::path(*input_path_data.input.content).root_directory() == *input_path_data.input.content)
             (*input_path_data.menu.entries).clear();
         else
@@ -53,10 +53,10 @@ int main() {
         switch (status(directory).type()) {
             case std::filesystem::file_type::directory:
                 get_directory_content(input_path_data);
-            break;
+                break;
             case std::filesystem::file_type::regular:
                 handel_file(input_path_data);
-            break;
+                break;
             default:
                 input_path_data.log = "Unsupported file type";
         }
