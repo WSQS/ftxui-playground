@@ -11,54 +11,7 @@ using namespace playground;
 
 int main() {
     auto screen = ScreenInteractive::Fullscreen();
-    constexpr auto handle_path_existence = [](path_data &input_path_data) {
-        if (!std::filesystem::exists(*input_path_data.input.content)) {
-            input_path_data.input.content = "/";
-            input_path_data.log = "Unavailable path";
-        }
-    };
-    constexpr auto get_directory_content = [](path_data &input_path_data) {
-        for (const auto &entry: std::filesystem::directory_iterator(*input_path_data.input.content)) {
-            (*input_path_data.menu.entries).push_back(entry.path().filename().string());
-        }
-    };
-    constexpr auto get_parent_directory = [](path_data &input_path_data) {
-        std::filesystem::path temp_directory{*input_path_data.input.content};
-        temp_directory = temp_directory.append("..").lexically_normal();
-        input_path_data.input.content = temp_directory.string();
-    };
-    constexpr auto run_command = [](path_data &input_path_data) {
-        std::thread commandThread{
-            [command = std::string("code ") + *input_path_data.input.content]() {
-                return std::system(command.c_str());
-            }
-        };
-        commandThread.detach();
-    };
-    constexpr auto handel_file = [run_command,get_parent_directory,get_directory_content](path_data &input_path_data) {
-        run_command(input_path_data);
-        get_parent_directory(input_path_data);
-        get_directory_content(input_path_data);
-    };
-    constexpr auto handel_file_type = [get_directory_content,handel_file](path_data &input_path_data) {
-        std::filesystem::path directory{*input_path_data.input.content};
-        switch (status(directory).type()) {
-            case std::filesystem::file_type::directory:
-                get_directory_content(input_path_data);
-                break;
-            case std::filesystem::file_type::regular:
-                handel_file(input_path_data);
-                break;
-            default:
-                input_path_data.log = "Unsupported file type";
-        }
-    };
-    constexpr auto build_log = [](const path_data &input_path_data) {
-        if (input_path_data.log.size() != 0)
-            return text(input_path_data.log) | border;
-        else
-            return std::make_shared<Node>();
-    };
+
     path_data input_data{{"/home/sophomore"}, {{{".."}}, {Make<int>()}, MenuOption::Vertical()},};
     MenuOption &menu_option = input_data.menu.option;
     InputOption &input_option = input_data.input.option;
@@ -75,7 +28,7 @@ int main() {
     // auto menu = Menu(input_data.menu.option);
     get_directory_content(input_data);
     input_option.multiline = false;
-    input_option.on_enter = [input_data,handle_path_existence,handel_file_type]() mutable {
+    input_option.on_enter = [input_data]() mutable {
         handle_path_existence(input_data);
         check_parent_sign(input_data);
         std::filesystem::path directory{*input_data.input.content};
@@ -112,7 +65,7 @@ int main() {
         }
         return false;
     });
-    auto component = Renderer(container, [input,menu,input_data,build_log] {
+    auto component = Renderer(container, [input,menu,input_data] {
         return vbox({
                    input->Render(),
                    separator(),
