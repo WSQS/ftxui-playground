@@ -18,7 +18,7 @@ int main() {
     // handel menu enter
     menu_option.on_enter = [&]() {
         handle_path_existence(input_data);
-        std::filesystem::path directory{input_data.input.content};
+        std::filesystem::path directory{*input_data.input.content};
         directory = directory.append((*input_data.menu.entries)[*input_data.menu.selected]).lexically_normal();
         input_data.input.content = directory.string();
         input_data.log = directory.string();
@@ -31,7 +31,7 @@ int main() {
     input_option.on_enter = [&input_data]() mutable {
         handle_path_existence(input_data);
         check_parent_sign(input_data);
-        std::filesystem::path directory{input_data.input.content};
+        std::filesystem::path directory{*input_data.input.content};
         handel_file_type(input_data);
     };
     input_option.transform = [](InputState state) {
