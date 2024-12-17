@@ -23,10 +23,10 @@ namespace playground {
     };
 
     struct input_data{
-        StringRef content{};
+        std::string content{};
         InputOption option{};
         Component instantiate() {
-            return Input(&*content,option);
+            return Input(&content,option);
         }
     };
 
@@ -40,31 +40,31 @@ namespace playground {
         }
     };
     inline auto check_parent_sign(path_data &input_path_data) {
-        if (std::filesystem::path(*input_path_data.input.content).root_directory() == *input_path_data.input.content)
+        if (std::filesystem::path(input_path_data.input.content).root_directory() == input_path_data.input.content)
             (*input_path_data.menu.entries).clear();
         else
             *input_path_data.menu.entries = {".."};
     }
     inline auto handle_path_existence(path_data &input_path_data) {
-        if (!std::filesystem::exists(*input_path_data.input.content)) {
+        if (!std::filesystem::exists(input_path_data.input.content)) {
             input_path_data.input.content = "/";
             input_path_data.log = "Unavailable path";
         }
     }
 
     inline auto get_directory_content(path_data &input_path_data) {
-        for (const auto &entry: std::filesystem::directory_iterator(*input_path_data.input.content)) {
+        for (const auto &entry: std::filesystem::directory_iterator(input_path_data.input.content)) {
             (*input_path_data.menu.entries).push_back(entry.path().filename().string());
         }
     };
     inline auto get_parent_directory(path_data &input_path_data) {
-        std::filesystem::path temp_directory{*input_path_data.input.content};
+        std::filesystem::path temp_directory{input_path_data.input.content};
         temp_directory = temp_directory.append("..").lexically_normal();
         input_path_data.input.content = temp_directory.string();
     };
     inline auto run_command(path_data &input_path_data) {
         std::thread commandThread{
-            [command = std::string("code ") + *input_path_data.input.content]() {
+            [command = std::string("code ") + input_path_data.input.content]() {
                 return std::system(command.c_str());
             }
         };
@@ -76,7 +76,7 @@ namespace playground {
         get_directory_content(input_path_data);
     };
     inline auto handel_file_type(path_data &input_path_data) {
-        std::filesystem::path directory{*input_path_data.input.content};
+        std::filesystem::path directory{input_path_data.input.content};
         switch (status(directory).type()) {
             case std::filesystem::file_type::directory:
                 get_directory_content(input_path_data);

@@ -9,16 +9,16 @@
 using namespace ftxui;
 using namespace playground;
 
-int main() {
-    auto screen = ScreenInteractive::Fullscreen();
-
+auto get_menu(std::vector<std::shared_ptr<path_data>>& path_datas)
+{
     auto input_data = Make<path_data>(path_data{{"/home/sophomore"}, {{{".."}}, {Make<int>()}, MenuOption::Vertical()},});
+    path_datas.push_back(input_data);
     MenuOption &menu_option = input_data->menu.option;
     InputOption &input_option = input_data->input.option;
     // handel menu enter
-    menu_option.on_enter = [&]() {
+    menu_option.on_enter = [input_data]() {
         handle_path_existence(*input_data);
-        std::filesystem::path directory{*input_data->input.content};
+        std::filesystem::path directory{input_data->input.content};
         directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).lexically_normal();
         input_data->input.content = directory.string();
         input_data->log = directory.string();
@@ -28,10 +28,10 @@ int main() {
     auto menu = input_data->menu.instantiate();
     get_directory_content(*input_data);
     input_option.multiline = false;
-    input_option.on_enter = [&input_data]() mutable {
+    input_option.on_enter = [input_data]() mutable {
         handle_path_existence(*input_data);
         check_parent_sign(*input_data);
-        std::filesystem::path directory{*input_data->input.content};
+        std::filesystem::path directory{input_data->input.content};
         handel_file_type(*input_data);
     };
     input_option.transform = [](InputState state) {
@@ -51,11 +51,11 @@ int main() {
     };
     auto input = input_data->input.instantiate();
     // auto input = Input(input_data.input.option);
-    auto container = Container::Vertical({input, menu}) | CatchEvent([&screen](const Event &event) {
+    auto container = Container::Vertical({input, menu}) | CatchEvent([](const Event &event) {
         if (event.is_character()) {
             switch (event.character()[0]) {
                 case 'q':
-                    screen.Exit();
+                    // screen.Exit();
                     return true;
                 case 'c':
                     return true;
@@ -65,7 +65,7 @@ int main() {
         }
         return false;
     });
-    auto component = Renderer(container, [input,menu,&input_data] {
+    auto component = Renderer(container, [input,menu,input_data] {
         return vbox({
                    input->Render(),
                    separator(),
@@ -73,6 +73,13 @@ int main() {
                    build_log(*input_data)
                }) | flex | border;
     });
+    return component;
+}
+
+int main() {
+    auto screen = ScreenInteractive::Fullscreen();
+    std::vector<std::shared_ptr<path_data>> path_datas;
+    auto component = get_menu(path_datas);
     // Limit the size of the document to 80 char.
     // document = document; //| size(WIDTH, LESS_THAN, 80);
 
