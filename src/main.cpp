@@ -12,27 +12,27 @@ using namespace playground;
 int main() {
     auto screen = ScreenInteractive::Fullscreen();
 
-    path_data input_data{{"/home/sophomore"}, {{{".."}}, {Make<int>()}, MenuOption::Vertical()},};
-    MenuOption &menu_option = input_data.menu.option;
-    InputOption &input_option = input_data.input.option;
+    auto input_data = Make<path_data>(path_data{{"/home/sophomore"}, {{{".."}}, {Make<int>()}, MenuOption::Vertical()},});
+    MenuOption &menu_option = input_data->menu.option;
+    InputOption &input_option = input_data->input.option;
     // handel menu enter
     menu_option.on_enter = [&]() {
-        handle_path_existence(input_data);
-        std::filesystem::path directory{*input_data.input.content};
-        directory = directory.append((*input_data.menu.entries)[*input_data.menu.selected]).lexically_normal();
-        input_data.input.content = directory.string();
-        input_data.log = directory.string();
-        check_parent_sign(input_data);
-        handel_file_type(input_data);
+        handle_path_existence(*input_data);
+        std::filesystem::path directory{*input_data->input.content};
+        directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).lexically_normal();
+        input_data->input.content = directory.string();
+        input_data->log = directory.string();
+        check_parent_sign(*input_data);
+        handel_file_type(*input_data);
     };
-    auto menu = input_data.menu.instantiate();
-    get_directory_content(input_data);
+    auto menu = input_data->menu.instantiate();
+    get_directory_content(*input_data);
     input_option.multiline = false;
     input_option.on_enter = [&input_data]() mutable {
-        handle_path_existence(input_data);
-        check_parent_sign(input_data);
-        std::filesystem::path directory{*input_data.input.content};
-        handel_file_type(input_data);
+        handle_path_existence(*input_data);
+        check_parent_sign(*input_data);
+        std::filesystem::path directory{*input_data->input.content};
+        handel_file_type(*input_data);
     };
     input_option.transform = [](InputState state) {
         state.element |= color(Color::White);
@@ -49,7 +49,7 @@ int main() {
         }
         return state.element;
     };
-    auto input = input_data.input.instantiate();
+    auto input = input_data->input.instantiate();
     // auto input = Input(input_data.input.option);
     auto container = Container::Vertical({input, menu}) | CatchEvent([&screen](const Event &event) {
         if (event.is_character()) {
@@ -70,7 +70,7 @@ int main() {
                    input->Render(),
                    separator(),
                    menu->Render() | yframe | yflex, // the flex is necessary for log to display
-                   build_log(input_data)
+                   build_log(*input_data)
                }) | flex | border;
     });
     // Limit the size of the document to 80 char.
