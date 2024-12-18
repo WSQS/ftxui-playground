@@ -39,12 +39,16 @@ int main() {
                    tab_container->Render(),
                }) |
                border;
-    })|CatchEvent([&](const Event& event) {
-        if (event==Event::Character('a')) {
+    }) | CatchEvent([&](const Event &event) {
+        if (event == Event::Character('a')) {
             // tab_values.push_back("aaa");
             add_folder_menu(tab_values, path_datas, menus);
             // tab_toggle = Toggle(&tab_values, &select);
             // tab_container = Container::Tab(menus, &select);
+        }
+        if (event == Event::Return) {
+            tab_values = build_tab_value(path_datas);
+            return false;
         }
         return false;
     });
