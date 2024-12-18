@@ -50,12 +50,12 @@ namespace playground
         }
     };
 
-    inline auto check_parent_sign(path_data& input_path_data)
+    inline auto check_parent_sign(const std::shared_ptr<path_data>& input_path_data)
     {
-        if (std::filesystem::path(input_path_data.input.content).root_directory() == input_path_data.input.content)
-            (*input_path_data.menu.entries).clear();
+        if (std::filesystem::path(input_path_data->input.content).root_directory() == input_path_data->input.content)
+            input_path_data->menu.entries->clear();
         else
-            *input_path_data.menu.entries = {".."};
+            *input_path_data->menu.entries = {".."};
     }
 
     inline auto handle_path_existence(path_data& input_path_data)
@@ -161,7 +161,7 @@ namespace playground
             std::filesystem::path directory{input_data->input.content};
             directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).lexically_normal();
             input_data->input.content = directory.string();
-            check_parent_sign(*input_data);
+            check_parent_sign(input_data);
             handel_file_type(*input_data);
         };
         auto menu = input_data->menu.instantiate();
@@ -170,7 +170,7 @@ namespace playground
         input_option.on_enter = [input_data]() mutable
         {
             handle_path_existence(*input_data);
-            check_parent_sign(*input_data);
+            check_parent_sign(input_data);
             std::filesystem::path directory{input_data->input.content};
             handel_file_type(*input_data);
         };
