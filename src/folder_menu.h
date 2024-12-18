@@ -23,12 +23,6 @@ namespace playground
     struct input_data
     {
         std::string content{};
-        InputOption option{};
-
-        Component instantiate()
-        {
-            return Input(&content, option);
-        }
     };
 
     struct path_data
@@ -142,7 +136,7 @@ namespace playground
         });
         path_datas.push_back(input_data);
         MenuOption menu_option{MenuOption::Vertical()};
-        InputOption& input_option = input_data->input.option;
+        InputOption input_option{};
         // handel menu enter
         menu_option.on_enter = [input_data]()
         {
@@ -164,7 +158,7 @@ namespace playground
             handel_file_type(input_data);
         };
         input_option.transform = input_transform;
-        auto input = input_data->input.instantiate();
+        auto input = Input(&input_data->input.content,input_option);
         auto container = Container::Vertical({input, menu}) | CatchEvent([](const Event& event)
         {
             if (event.is_character())

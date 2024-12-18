@@ -11,7 +11,7 @@ namespace playground {
         path_data data{};
     public:
         folder_menu_base(path_data data): data(std::move(data)) {
-            children_ = data.instantiate();
+            // children_ = data.instantiate();
             // children_ = {{},{}};
         }
 
