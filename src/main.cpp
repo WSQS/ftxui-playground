@@ -26,14 +26,15 @@ int main()
         tab_toggle,
         tab_container,
     });
-    auto renderer = Renderer(container, [&] {
-  return vbox({
-             tab_toggle->Render(),
-             separator(),
-             tab_container->Render(),
-         }) |
-         border;
-});
+    auto renderer = Renderer(container, [&]
+    {
+        return vbox({
+                tab_toggle->Render(),
+                separator(),
+                tab_container->Render(),
+            }) |
+            border;
+    });
     // Limit the size of the document to 80 char.
     // document = document; //| size(WIDTH, LESS_THAN, 80);
 
