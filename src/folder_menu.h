@@ -20,14 +20,9 @@ namespace playground
         std::shared_ptr<int> selected{};
     };
 
-    struct input_data
-    {
-        std::string content{};
-    };
-
     struct path_data
     {
-        input_data input{};
+        std::string file_path{};
         menu_data menu{};
         std::string log{};
         int selected = 1;
@@ -35,7 +30,7 @@ namespace playground
 
     inline auto check_parent_sign(const std::shared_ptr<path_data>& input_path_data)
     {
-        if (std::filesystem::path(input_path_data->input.content).root_directory() == input_path_data->input.content)
+        if (std::filesystem::path(input_path_data->file_path).root_directory() == input_path_data->file_path)
             input_path_data->menu.entries->clear();
         else
             *input_path_data->menu.entries = {".."};
@@ -43,16 +38,16 @@ namespace playground
 
     inline auto handle_path_existence(const std::shared_ptr<path_data>& input_path_data)
     {
-        if (!std::filesystem::exists(input_path_data->input.content))
+        if (!std::filesystem::exists(input_path_data->file_path))
         {
-            input_path_data->input.content = "/";
+            input_path_data->file_path = "/";
             input_path_data->log = "Unavailable path";
         }
     }
 
     inline auto get_directory_content(const std::shared_ptr<path_data>& input_path_data)
     {
-        for (const auto& entry : std::filesystem::directory_iterator(input_path_data->input.content))
+        for (const auto& entry : std::filesystem::directory_iterator(input_path_data->file_path))
         {
             input_path_data->menu.entries->push_back(entry.path().filename().string());
         }
@@ -60,15 +55,15 @@ namespace playground
 
     inline auto get_parent_directory(const std::shared_ptr<path_data>& input_path_data)
     {
-        std::filesystem::path temp_directory{input_path_data->input.content};
+        std::filesystem::path temp_directory{input_path_data->file_path};
         temp_directory = temp_directory.append("..").lexically_normal();
-        input_path_data->input.content = temp_directory.string();
+        input_path_data->file_path = temp_directory.string();
     };
 
     inline auto run_command(const std::shared_ptr<path_data>& input_path_data)
     {
         std::thread commandThread{
-            [command = std::string("code ") + input_path_data->input.content]()
+            [command = std::string("code ") + input_path_data->file_path]()
             {
                 return std::system(command.c_str());
             }
@@ -85,7 +80,7 @@ namespace playground
 
     inline auto handel_file_type(const std::shared_ptr<path_data>& input_path_data)
     {
-        std::filesystem::path directory{input_path_data->input.content};
+        std::filesystem::path directory{input_path_data->file_path};
         switch (status(directory).type())
         {
         case std::filesystem::file_type::directory:
@@ -141,9 +136,9 @@ namespace playground
         menu_option.on_enter = [input_data]()
         {
             handle_path_existence(input_data);
-            std::filesystem::path directory{input_data->input.content};
+            std::filesystem::path directory{input_data->file_path};
             directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).lexically_normal();
-            input_data->input.content = directory.string();
+            input_data->file_path = directory.string();
             check_parent_sign(input_data);
             handel_file_type(input_data);
         };
@@ -154,11 +149,11 @@ namespace playground
         {
             handle_path_existence(input_data);
             check_parent_sign(input_data);
-            std::filesystem::path directory{input_data->input.content};
+            std::filesystem::path directory{input_data->file_path};
             handel_file_type(input_data);
         };
         input_option.transform = input_transform;
-        auto input = Input(&input_data->input.content,input_option);
+        auto input = Input(&input_data->file_path,input_option);
         auto container = Container::Vertical({input, menu}) | CatchEvent([](const Event& event)
         {
             if (event.is_character())
