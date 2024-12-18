@@ -28,8 +28,6 @@ namespace playground
         int selected = 1;
     };
 
-
-
     inline auto check_parent_sign(const std::shared_ptr<path_data>& input_path_data)
     {
         if (std::filesystem::path(input_path_data->file_path).root_directory() == input_path_data->
@@ -194,6 +192,15 @@ namespace playground
             }) | flex | border;
         });
     }
+
+    inline auto build_tab_value(std::vector<std::shared_ptr<path_data> > &path_datas) {
+        std::vector<std::string> data;
+        for (const auto&path_data:path_datas) {
+            data.push_back(path_data->file_path);
+        }
+        return data;
+    }
+
 
     Component folder_menu();
 

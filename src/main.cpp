@@ -7,12 +7,13 @@
 using namespace ftxui;
 using namespace playground;
 
+
 auto add_folder_menu(std::vector<std::string> &tab_values, std::vector<std::shared_ptr<path_data> > &path_datas,
                      Components &menus) {
-    tab_values.push_back({"/home"});
     auto input_data = Make<path_data>(path_data{
-        tab_values.back(), {{{".."}}, {Make<int>()}},
+        "/home", {{{".."}}, {Make<int>()}},
     });
+    tab_values = build_tab_value(path_datas);
     path_datas.push_back(input_data);
     menus.push_back(FileMenu(input_data));
 }
@@ -40,8 +41,8 @@ int main() {
                border;
     })|CatchEvent([&](const Event& event) {
         if (event==Event::Character('a')) {
-            tab_values.push_back("aaa");
-            // add_folder_menu(tab_values, path_datas, menus);
+            // tab_values.push_back("aaa");
+            add_folder_menu(tab_values, path_datas, menus);
             // tab_toggle = Toggle(&tab_values, &select);
             // tab_container = Container::Tab(menus, &select);
         }
