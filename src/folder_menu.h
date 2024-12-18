@@ -139,7 +139,6 @@ namespace playground
             std::filesystem::path directory{input_data->input.content};
             directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).lexically_normal();
             input_data->input.content = directory.string();
-            input_data->log = directory.string();
             check_parent_sign(*input_data);
             handel_file_type(*input_data);
         };

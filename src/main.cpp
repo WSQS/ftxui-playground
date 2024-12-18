@@ -2,9 +2,7 @@
 #include <iostream>
 #include "folder_menu.h"
 #include "ftxui/component/component.hpp"
-#include "ftxui/component/component_base.hpp"
 #include "ftxui/component/screen_interactive.hpp"
-#include "ftxui/dom/elements.hpp"
 
 using namespace ftxui;
 using namespace playground;
