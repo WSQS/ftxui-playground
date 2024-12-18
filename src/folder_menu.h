@@ -75,14 +75,14 @@ namespace playground
         }
     };
 
-    inline auto get_parent_directory(const std::shared_ptr<path_data>&input_path_data)
+    inline auto get_parent_directory(const std::shared_ptr<path_data>& input_path_data)
     {
         std::filesystem::path temp_directory{input_path_data->input.content};
         temp_directory = temp_directory.append("..").lexically_normal();
         input_path_data->input.content = temp_directory.string();
     };
 
-    inline auto run_command(const std::shared_ptr<path_data>&input_path_data)
+    inline auto run_command(const std::shared_ptr<path_data>& input_path_data)
     {
         std::thread commandThread{
             [command = std::string("code ") + input_path_data->input.content]()
@@ -93,7 +93,7 @@ namespace playground
         commandThread.detach();
     };
 
-    inline auto handel_file(const std::shared_ptr<path_data>&input_path_data)
+    inline auto handel_file(const std::shared_ptr<path_data>& input_path_data)
     {
         run_command(input_path_data);
         get_parent_directory(input_path_data);
@@ -116,10 +116,10 @@ namespace playground
         }
     };
 
-    inline auto build_log(const path_data& input_path_data)
+    inline auto build_log(const std::shared_ptr<path_data>& input_path_data)
     {
-        if (input_path_data.log.size() != 0)
-            return text(input_path_data.log) | border;
+        if (input_path_data->log.size() != 0)
+            return text(input_path_data->log) | border;
         else
             return std::make_shared<Node>();
     };
@@ -200,7 +200,7 @@ namespace playground
                 input->Render(),
                 separator(),
                 menu->Render() | yframe | yflex, // the flex is necessary for log to display
-                build_log(*input_data)
+                build_log(input_data)
             }) | flex | border;
         });
         return component;
