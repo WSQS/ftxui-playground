@@ -153,6 +153,24 @@ namespace playground
         return Input(&input_path_data->file_path,input_option);
     }
 
+    inline auto handle_input(const Event& event)
+    {
+        if (event.is_character())
+        {
+            switch (event.character()[0])
+            {
+            case 'q':
+                // screen.Exit();
+                    return true;
+            case 'c':
+                return true;
+            default:
+                break;
+            }
+        }
+        return false;
+    }
+
     inline auto FileMenu(std::vector<std::shared_ptr<path_data>>& path_datas)
     {
         auto input_data = Make<path_data>(path_data{
@@ -163,23 +181,7 @@ namespace playground
         get_directory_content(input_data);
         auto menu = get_menu(input_data);
         auto input = get_input(input_data);
-        auto container = Container::Vertical({input, menu}) | CatchEvent([](const Event& event)
-        {
-            if (event.is_character())
-            {
-                switch (event.character()[0])
-                {
-                case 'q':
-                    // screen.Exit();
-                    return true;
-                case 'c':
-                    return true;
-                default:
-                    break;
-                }
-            }
-            return false;
-        });
+        auto container = Container::Vertical({input, menu}) | CatchEvent(handle_input);
         return Renderer(container, [input,menu,input_data]
         {
             return vbox({
