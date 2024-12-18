@@ -194,7 +194,7 @@ namespace playground
             }
             return false;
         });
-        auto component = Renderer(container, [input,menu,input_data]
+        return Renderer(container, [input,menu,input_data]
         {
             return vbox({
                 input->Render(),
@@ -203,7 +203,6 @@ namespace playground
                 build_log(input_data)
             }) | flex | border;
         });
-        return component;
     }
 
     Component folder_menu();
