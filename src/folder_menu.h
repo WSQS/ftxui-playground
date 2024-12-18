@@ -124,7 +124,29 @@ namespace playground
             return std::make_shared<Node>();
     };
 
-    auto get_menu(std::vector<std::shared_ptr<path_data>>& path_datas)
+    inline auto input_transform(InputState state)
+    {
+        state.element |= color(Color::White);
+        if (state.is_placeholder)
+        {
+            state.element |= dim;
+        }
+        if (state.focused)
+        {
+            state.element |= inverted;
+        }
+        else
+        {
+            state.element |= hcenter;
+        }
+        if (state.hovered)
+        {
+            state.element |= bgcolor(Color::GrayDark);
+        }
+        return state.element;
+    };
+
+    inline auto get_menu(std::vector<std::shared_ptr<path_data>>& path_datas)
     {
         auto input_data = Make<path_data>(path_data{
             {"/home/sophomore"}, {{{".."}}, {Make<int>()}, MenuOption::Vertical()},
@@ -152,27 +174,7 @@ namespace playground
             std::filesystem::path directory{input_data->input.content};
             handel_file_type(*input_data);
         };
-        input_option.transform = [](InputState state)
-        {
-            state.element |= color(Color::White);
-            if (state.is_placeholder)
-            {
-                state.element |= dim;
-            }
-            if (state.focused)
-            {
-                state.element |= inverted;
-            }
-            else
-            {
-                state.element |= hcenter;
-            }
-            if (state.hovered)
-            {
-                state.element |= bgcolor(Color::GrayDark);
-            }
-            return state.element;
-        };
+        input_option.transform = input_transform;
         auto input = input_data->input.instantiate();
         // auto input = Input(input_data.input.option);
         auto container = Container::Vertical({input, menu}) | CatchEvent([](const Event& event)
