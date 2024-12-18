@@ -26,7 +26,9 @@ FetchContent_Declare(ftxui
 FetchContent_MakeAvailable(ftxui)
 # ------------------------------------------------------------------------------
 
-add_executable(ftxui-playground src/main.cpp)
+add_executable(ftxui-playground src/main.cpp
+        src/folder_menu.cpp
+        src/folder_menu.h)
 target_include_directories(ftxui-playground PRIVATE src)
 
 target_link_libraries(ftxui-playground
