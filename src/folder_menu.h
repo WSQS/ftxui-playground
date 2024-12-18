@@ -30,7 +30,8 @@ namespace playground
 
     inline auto check_parent_sign(const std::shared_ptr<path_data>& input_path_data)
     {
-        if (std::filesystem::path(input_path_data->file_path).root_directory() == input_path_data->file_path)
+        if (std::filesystem::path(input_path_data->file_path).root_directory() == input_path_data->
+            file_path)
             input_path_data->menu.entries->clear();
         else
             *input_path_data->menu.entries = {".."};
@@ -110,13 +111,16 @@ namespace playground
         {
             handle_path_existence(input_data);
             std::filesystem::path directory{input_data->file_path};
-            directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).lexically_normal();
+            directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).
+                                  lexically_normal();
             input_data->file_path = directory.string();
             check_parent_sign(input_data);
             handel_file_type(input_data);
         };
-        return Menu(&*input_path_data->menu.entries,input_path_data->menu.selected.get(),menu_option);
+        return Menu(&*input_path_data->menu.entries, input_path_data->menu.selected.get(),
+                    menu_option);
     }
+
     inline auto input_transform(InputState state)
     {
         state.element |= color(Color::White);
@@ -138,6 +142,7 @@ namespace playground
         }
         return state.element;
     };
+
     inline auto get_input(const std::shared_ptr<path_data>& input_path_data)
     {
         InputOption input_option{};
@@ -150,7 +155,7 @@ namespace playground
             handel_file_type(input_data);
         };
         input_option.transform = input_transform;
-        return Input(&input_path_data->file_path,input_option);
+        return Input(&input_path_data->file_path, input_option);
     }
 
     inline auto handle_input(const Event& event)
@@ -161,7 +166,7 @@ namespace playground
             {
             case 'q':
                 // screen.Exit();
-                    return true;
+                return true;
             case 'c':
                 return true;
             default:
