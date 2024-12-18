@@ -37,8 +37,7 @@ int main() {
                    tab_toggle->Render(),
                    separator(),
                    tab_container->Render(),
-               }) |
-               border;
+               }) | border;
     }) | CatchEvent([&](const Event &event) {
         if (event == Event::Character('a')) {
             // tab_values.push_back("aaa");
