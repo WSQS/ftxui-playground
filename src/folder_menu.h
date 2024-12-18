@@ -58,34 +58,34 @@ namespace playground
             *input_path_data->menu.entries = {".."};
     }
 
-    inline auto handle_path_existence(path_data& input_path_data)
+    inline auto handle_path_existence(const std::shared_ptr<path_data>& input_path_data)
     {
-        if (!std::filesystem::exists(input_path_data.input.content))
+        if (!std::filesystem::exists(input_path_data->input.content))
         {
-            input_path_data.input.content = "/";
-            input_path_data.log = "Unavailable path";
+            input_path_data->input.content = "/";
+            input_path_data->log = "Unavailable path";
         }
     }
 
-    inline auto get_directory_content(path_data& input_path_data)
+    inline auto get_directory_content(const std::shared_ptr<path_data>& input_path_data)
     {
-        for (const auto& entry : std::filesystem::directory_iterator(input_path_data.input.content))
+        for (const auto& entry : std::filesystem::directory_iterator(input_path_data->input.content))
         {
-            (*input_path_data.menu.entries).push_back(entry.path().filename().string());
+            input_path_data->menu.entries->push_back(entry.path().filename().string());
         }
     };
 
-    inline auto get_parent_directory(path_data& input_path_data)
+    inline auto get_parent_directory(const std::shared_ptr<path_data>&input_path_data)
     {
-        std::filesystem::path temp_directory{input_path_data.input.content};
+        std::filesystem::path temp_directory{input_path_data->input.content};
         temp_directory = temp_directory.append("..").lexically_normal();
-        input_path_data.input.content = temp_directory.string();
+        input_path_data->input.content = temp_directory.string();
     };
 
-    inline auto run_command(path_data& input_path_data)
+    inline auto run_command(const std::shared_ptr<path_data>&input_path_data)
     {
         std::thread commandThread{
-            [command = std::string("code ") + input_path_data.input.content]()
+            [command = std::string("code ") + input_path_data->input.content]()
             {
                 return std::system(command.c_str());
             }
@@ -93,16 +93,16 @@ namespace playground
         commandThread.detach();
     };
 
-    inline auto handel_file(path_data& input_path_data)
+    inline auto handel_file(const std::shared_ptr<path_data>&input_path_data)
     {
         run_command(input_path_data);
         get_parent_directory(input_path_data);
         get_directory_content(input_path_data);
     };
 
-    inline auto handel_file_type(path_data& input_path_data)
+    inline auto handel_file_type(const std::shared_ptr<path_data>& input_path_data)
     {
-        std::filesystem::path directory{input_path_data.input.content};
+        std::filesystem::path directory{input_path_data->input.content};
         switch (status(directory).type())
         {
         case std::filesystem::file_type::directory:
@@ -112,7 +112,7 @@ namespace playground
             handel_file(input_path_data);
             break;
         default:
-            input_path_data.log = "Unsupported file type";
+            input_path_data->log = "Unsupported file type";
         }
     };
 
@@ -157,22 +157,22 @@ namespace playground
         // handel menu enter
         menu_option.on_enter = [input_data]()
         {
-            handle_path_existence(*input_data);
+            handle_path_existence(input_data);
             std::filesystem::path directory{input_data->input.content};
             directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).lexically_normal();
             input_data->input.content = directory.string();
             check_parent_sign(input_data);
-            handel_file_type(*input_data);
+            handel_file_type(input_data);
         };
         auto menu = input_data->menu.instantiate();
-        get_directory_content(*input_data);
+        get_directory_content(input_data);
         input_option.multiline = false;
         input_option.on_enter = [input_data]() mutable
         {
-            handle_path_existence(*input_data);
+            handle_path_existence(input_data);
             check_parent_sign(input_data);
             std::filesystem::path directory{input_data->input.content};
-            handel_file_type(*input_data);
+            handel_file_type(input_data);
         };
         input_option.transform = input_transform;
         auto input = input_data->input.instantiate();
