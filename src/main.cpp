@@ -7,33 +7,45 @@
 using namespace ftxui;
 using namespace playground;
 
-int main()
-{
+auto add_folder_menu(std::vector<std::string> &tab_values, std::vector<std::shared_ptr<path_data> > &path_datas,
+                     Components &menus) {
+    tab_values.push_back({"/home"});
+    auto input_data = Make<path_data>(path_data{
+        tab_values.back(), {{{".."}}, {Make<int>()}},
+    });
+    path_datas.push_back(input_data);
+    menus.push_back(FileMenu(input_data));
+}
+
+int main() {
     auto screen = ScreenInteractive::Fullscreen();
-    std::vector<std::shared_ptr<path_data>> path_datas;
+    std::vector<std::shared_ptr<path_data> > path_datas;
     Components menus;
-    menus.push_back(FileMenu(path_datas));
-    menus.push_back(FileMenu(path_datas));
     int select = 0;
-    std::vector<std::string> tab_values{
-        "tab_1",
-        "tab_2",
-        "tab_3",
-    };
+    std::vector<std::string> tab_values{};
+    add_folder_menu(tab_values, path_datas, menus);
+    add_folder_menu(tab_values, path_datas, menus);
     auto tab_toggle = Toggle(&tab_values, &select);
     auto tab_container = Container::Tab(menus, &select);
     auto container = Container::Vertical({
         tab_toggle,
         tab_container,
     });
-    auto renderer = Renderer(container, [&]
-    {
+    auto renderer = Renderer(container, [&] {
         return vbox({
-                tab_toggle->Render(),
-                separator(),
-                tab_container->Render(),
-            }) |
-            border;
+                   tab_toggle->Render(),
+                   separator(),
+                   tab_container->Render(),
+               }) |
+               border;
+    })|CatchEvent([&](const Event& event) {
+        if (event==Event::Character('a')) {
+            tab_values.push_back("aaa");
+            // add_folder_menu(tab_values, path_datas, menus);
+            // tab_toggle = Toggle(&tab_values, &select);
+            // tab_container = Container::Tab(menus, &select);
+        }
+        return false;
     });
     // Limit the size of the document to 80 char.
     // document = document; //| size(WIDTH, LESS_THAN, 80);

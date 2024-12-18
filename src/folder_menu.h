@@ -22,11 +22,13 @@ namespace playground
 
     struct path_data
     {
-        std::string file_path{};
+        std::string file_path;
         menu_data menu{};
         std::string log{};
         int selected = 1;
     };
+
+
 
     inline auto check_parent_sign(const std::shared_ptr<path_data>& input_path_data)
     {
@@ -176,13 +178,8 @@ namespace playground
         return false;
     }
 
-    inline auto FileMenu(std::vector<std::shared_ptr<path_data>>& path_datas)
+    inline auto FileMenu(std::shared_ptr<path_data>& input_data)
     {
-        auto input_data = Make<path_data>(path_data{
-            {"/home/sophomore"}, {{{".."}}, {Make<int>()}},
-        });
-        path_datas.push_back(input_data);
-
         get_directory_content(input_data);
         auto menu = get_menu(input_data);
         auto input = get_input(input_data);
