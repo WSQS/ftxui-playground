@@ -102,6 +102,21 @@ namespace playground
             return std::make_shared<Node>();
     };
 
+    inline auto get_menu(const std::shared_ptr<path_data>& input_path_data)
+    {
+        MenuOption menu_option{MenuOption::Vertical()};
+        // handel menu enter
+        menu_option.on_enter = [input_data=input_path_data]()
+        {
+            handle_path_existence(input_data);
+            std::filesystem::path directory{input_data->file_path};
+            directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).lexically_normal();
+            input_data->file_path = directory.string();
+            check_parent_sign(input_data);
+            handel_file_type(input_data);
+        };
+        return Menu(&*input_path_data->menu.entries,input_path_data->menu.selected.get(),menu_option);
+    }
     inline auto input_transform(InputState state)
     {
         state.element |= color(Color::White);
@@ -123,29 +138,11 @@ namespace playground
         }
         return state.element;
     };
-
-    inline auto FileMenu(std::vector<std::shared_ptr<path_data>>& path_datas)
+    inline auto get_input(const std::shared_ptr<path_data>& input_path_data)
     {
-        auto input_data = Make<path_data>(path_data{
-            {"/home/sophomore"}, {{{".."}}, {Make<int>()}},
-        });
-        path_datas.push_back(input_data);
-        MenuOption menu_option{MenuOption::Vertical()};
         InputOption input_option{};
-        // handel menu enter
-        menu_option.on_enter = [input_data]()
-        {
-            handle_path_existence(input_data);
-            std::filesystem::path directory{input_data->file_path};
-            directory = directory.append((*input_data->menu.entries)[*input_data->menu.selected]).lexically_normal();
-            input_data->file_path = directory.string();
-            check_parent_sign(input_data);
-            handel_file_type(input_data);
-        };
-        auto menu = Menu(&*input_data->menu.entries,input_data->menu.selected.get(),menu_option);
-        get_directory_content(input_data);
         input_option.multiline = false;
-        input_option.on_enter = [input_data]() mutable
+        input_option.on_enter = [input_data=input_path_data]() mutable
         {
             handle_path_existence(input_data);
             check_parent_sign(input_data);
@@ -153,7 +150,19 @@ namespace playground
             handel_file_type(input_data);
         };
         input_option.transform = input_transform;
-        auto input = Input(&input_data->file_path,input_option);
+        return Input(&input_path_data->file_path,input_option);
+    }
+
+    inline auto FileMenu(std::vector<std::shared_ptr<path_data>>& path_datas)
+    {
+        auto input_data = Make<path_data>(path_data{
+            {"/home/sophomore"}, {{{".."}}, {Make<int>()}},
+        });
+        path_datas.push_back(input_data);
+
+        get_directory_content(input_data);
+        auto menu = get_menu(input_data);
+        auto input = get_input(input_data);
         auto container = Container::Vertical({input, menu}) | CatchEvent([](const Event& event)
         {
             if (event.is_character())
