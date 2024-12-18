@@ -18,12 +18,6 @@ namespace playground
     {
         Ref<std::vector<std::string>> entries{};
         std::shared_ptr<int> selected{};
-        MenuOption option{};
-
-        Component instantiate()
-        {
-            return Menu(&*entries, selected.get(), option);
-        }
     };
 
     struct input_data
@@ -43,11 +37,6 @@ namespace playground
         menu_data menu{};
         std::string log{};
         int selected = 1;
-
-        Components instantiate()
-        {
-            return {input.instantiate(), menu.instantiate()};
-        }
     };
 
     inline auto check_parent_sign(const std::shared_ptr<path_data>& input_path_data)
@@ -146,13 +135,13 @@ namespace playground
         return state.element;
     };
 
-    inline auto get_menu(std::vector<std::shared_ptr<path_data>>& path_datas)
+    inline auto FileMenu(std::vector<std::shared_ptr<path_data>>& path_datas)
     {
         auto input_data = Make<path_data>(path_data{
-            {"/home/sophomore"}, {{{".."}}, {Make<int>()}, MenuOption::Vertical()},
+            {"/home/sophomore"}, {{{".."}}, {Make<int>()}},
         });
         path_datas.push_back(input_data);
-        MenuOption& menu_option = input_data->menu.option;
+        MenuOption menu_option{MenuOption::Vertical()};
         InputOption& input_option = input_data->input.option;
         // handel menu enter
         menu_option.on_enter = [input_data]()
@@ -164,7 +153,7 @@ namespace playground
             check_parent_sign(input_data);
             handel_file_type(input_data);
         };
-        auto menu = input_data->menu.instantiate();
+        auto menu = Menu(&*input_data->menu.entries,input_data->menu.selected.get(),menu_option);
         get_directory_content(input_data);
         input_option.multiline = false;
         input_option.on_enter = [input_data]() mutable
@@ -176,7 +165,6 @@ namespace playground
         };
         input_option.transform = input_transform;
         auto input = input_data->input.instantiate();
-        // auto input = Input(input_data.input.option);
         auto container = Container::Vertical({input, menu}) | CatchEvent([](const Event& event)
         {
             if (event.is_character())

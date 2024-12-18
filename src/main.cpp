@@ -10,7 +10,7 @@ using namespace playground;
 int main() {
     auto screen = ScreenInteractive::Fullscreen();
     std::vector<std::shared_ptr<path_data>> path_datas;
-    auto component = get_menu(path_datas);
+    auto component = FileMenu(path_datas);
     // Limit the size of the document to 80 char.
     // document = document; //| size(WIDTH, LESS_THAN, 80);
 
