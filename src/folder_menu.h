@@ -4,12 +4,13 @@
 
 #ifndef FOLDER_MENU_H
 #define FOLDER_MENU_H
-#include <vector>
 #include <filesystem>
 #include <thread>
+#include <vector>
 
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/component_base.hpp"
+#include "ftxui/component/event.hpp"
 using namespace ftxui;
 
 namespace playground
@@ -194,9 +195,9 @@ namespace playground
     }
 
     inline auto build_tab_value(std::vector<std::shared_ptr<path_data> > &path_datas) {
-        std::vector<std::string> data;
+        std::vector<std::string*> data;
         for (const auto&path_data:path_datas) {
-            data.push_back(path_data->file_path);
+            data.push_back(&path_data->file_path);
         }
         return data;
     }
