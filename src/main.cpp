@@ -10,24 +10,25 @@ using namespace playground;
 
 
 auto add_folder_menu(std::vector<std::string*> &tab_values, std::vector<std::shared_ptr<path_data> > &path_datas,
-                     Components &menus) {
+                     Component &tab_container) {
+    static int i = 0;
     auto input_data = Make<path_data>(path_data{
-        "/home", {{{".."}}, {Make<int>()}},
+        "/home", {{{".."}}, {Make<int>()}},{std::to_string(i)}
     });
+    i++;
     tab_values = build_tab_value(path_datas);
     path_datas.push_back(input_data);
-    menus.push_back(FileMenu(input_data));
+    tab_container->Add(FileMenu(input_data));
 }
 
 int main() {
     std::vector<std::shared_ptr<path_data> > path_datas;
-    Components menus;
     int select = 0;
     std::vector<std::string*> tab_values{};
-    add_folder_menu(tab_values, path_datas, menus);
-    add_folder_menu(tab_values, path_datas, menus);
+    auto tab_container = Container::Tab({}, &select);
+    add_folder_menu(tab_values, path_datas, tab_container);
+    add_folder_menu(tab_values, path_datas, tab_container);
     auto tab_toggle = Toggle(&tab_values, &select);
-    auto tab_container = Container::Tab(menus, &select);
     auto container = Container::Vertical({
         tab_toggle,
         tab_container,
@@ -41,9 +42,9 @@ int main() {
     }) | CatchEvent([&](const Event &event) {
         if (event == Event::Character('a')) {
             // tab_values.push_back("aaa");
-            add_folder_menu(tab_values, path_datas, menus);
+            add_folder_menu(tab_values, path_datas, tab_container);
             // move focus to the last tab
-            select = tab_values.size() - 1;
+            select = static_cast<int>(tab_values.size()) - 1;
             return true;
         }
         // if (event == Event::Return) {
