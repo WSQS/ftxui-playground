@@ -42,8 +42,9 @@ int main() {
         if (event == Event::Character('a')) {
             // tab_values.push_back("aaa");
             add_folder_menu(tab_values, path_datas, menus);
-            // tab_toggle = Toggle(&tab_values, &select);
-            // tab_container = Container::Tab(menus, &select);
+            // move focus to the last tab
+            select = tab_values.size() - 1;
+            return true;
         }
         // if (event == Event::Return) {
         //     tab_values = build_tab_value(path_datas);
