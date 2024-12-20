@@ -49,6 +49,7 @@ int main() {
         // handel log
         if (event.input().size() >= 3 && event.input().substr(0, 3) == "log") {
             log = event.input().substr(3, event.input().size() - 3);
+            return true;
         }
         // if (event == Event::Return) {
         //     tab_values = build_tab_value(path_datas);
