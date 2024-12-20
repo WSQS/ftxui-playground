@@ -10,11 +10,9 @@ using namespace playground;
 
 auto add_folder_menu(std::vector<std::string *> &tab_values, std::vector<std::shared_ptr<path_data> > &path_datas,
                      Component &tab_container) {
-    static int i = 0;
     auto input_data = Make<path_data>(path_data{
         "/home", {{{".."}}, {Make<int>()}}
     });
-    i++;
     tab_values = build_tab_value(path_datas);
     path_datas.push_back(input_data);
     tab_container->Add(FileMenu(input_data));
