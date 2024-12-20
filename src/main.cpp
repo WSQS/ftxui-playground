@@ -17,8 +17,10 @@ auto add_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Compo
 }
 
 auto remove_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container, int index) {
-    if (path_datas.empty())
+    if (path_datas.empty()) {
+        log("There is not tab anymore");
         return;
+    }
     path_datas.erase(path_datas.begin() + index);
     tab_container->ChildAt(index)->Detach();
 }
@@ -41,7 +43,7 @@ int main() {
         return vbox({
                    tab_toggle->Render(),
                    separator(),
-                   tab_container->Render(),
+                   tab_container->Render()|flex,
                    build_log(log),
                }) | border;
     }) | CatchEvent([&](const Event &event) {
