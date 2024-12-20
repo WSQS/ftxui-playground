@@ -26,7 +26,6 @@ namespace playground
     {
         std::string file_path;
         menu_data menu{};
-        std::string log{};
         int selected = 1;
     };
 
@@ -49,7 +48,7 @@ namespace playground
         if (!std::filesystem::exists(input_path_data->file_path))
         {
             input_path_data->file_path = "/";
-            input_path_data->log = "Unavailable path";
+            get_screen().PostEvent(Event::Special("logUnavailable path"));
         }
     }
 
@@ -98,14 +97,14 @@ namespace playground
             handel_file(input_path_data);
             break;
         default:
-            input_path_data->log = "Unsupported file type";
+            get_screen().PostEvent(Event::Special("logUnsupported file type"));
         }
     };
 
-    inline auto build_log(const std::shared_ptr<path_data>& input_path_data)
+    inline auto build_log(const std::string& log)
     {
-        if (input_path_data->log.size() != 0)
-            return text(input_path_data->log) | border;
+        if (log.size() != 0)
+            return text(log) | border;
         else
             return std::make_shared<Node>();
     };
@@ -195,7 +194,7 @@ namespace playground
                 input->Render(),
                 separator(),
                 menu->Render() | yframe | yflex, // the flex is necessary for log to display
-                build_log(input_data)
+                // build_log(input_data)
             }) | flex | border;
         });
     }

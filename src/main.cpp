@@ -8,12 +8,11 @@ using namespace ftxui;
 using namespace playground;
 
 
-
-auto add_folder_menu(std::vector<std::string*> &tab_values, std::vector<std::shared_ptr<path_data> > &path_datas,
+auto add_folder_menu(std::vector<std::string *> &tab_values, std::vector<std::shared_ptr<path_data> > &path_datas,
                      Component &tab_container) {
     static int i = 0;
     auto input_data = Make<path_data>(path_data{
-        "/home", {{{".."}}, {Make<int>()}},{std::to_string(i)}
+        "/home", {{{".."}}, {Make<int>()}}
     });
     i++;
     tab_values = build_tab_value(path_datas);
@@ -24,7 +23,7 @@ auto add_folder_menu(std::vector<std::string*> &tab_values, std::vector<std::sha
 int main() {
     std::vector<std::shared_ptr<path_data> > path_datas;
     int select = 0;
-    std::vector<std::string*> tab_values{};
+    std::vector<std::string *> tab_values{};
     auto tab_container = Container::Tab({}, &select);
     add_folder_menu(tab_values, path_datas, tab_container);
     add_folder_menu(tab_values, path_datas, tab_container);
@@ -33,11 +32,13 @@ int main() {
         tab_toggle,
         tab_container,
     });
+    std::string log{};
     auto renderer = Renderer(container, [&] {
         return vbox({
                    tab_toggle->Render(),
                    separator(),
                    tab_container->Render(),
+                   build_log(log),
                }) | border;
     }) | CatchEvent([&](const Event &event) {
         if (event == Event::Character('a')) {
@@ -46,6 +47,9 @@ int main() {
             // move focus to the last tab
             select = static_cast<int>(tab_values.size()) - 1;
             return true;
+        }
+        if (event.input().size() >= 3 && event.input().substr(0, 3) == "log") {
+            log = event.input().substr(3, event.input().size() - 3);
         }
         // if (event == Event::Return) {
         //     tab_values = build_tab_value(path_datas);
