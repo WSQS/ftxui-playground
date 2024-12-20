@@ -2,10 +2,11 @@
 #include <iostream>
 #include "folder_menu.h"
 #include "ftxui/component/component.hpp"
-#include "ftxui/component/screen_interactive.hpp"
+
 
 using namespace ftxui;
 using namespace playground;
+
 
 
 auto add_folder_menu(std::vector<std::string*> &tab_values, std::vector<std::shared_ptr<path_data> > &path_datas,
@@ -19,7 +20,6 @@ auto add_folder_menu(std::vector<std::string*> &tab_values, std::vector<std::sha
 }
 
 int main() {
-    auto screen = ScreenInteractive::Fullscreen();
     std::vector<std::shared_ptr<path_data> > path_datas;
     Components menus;
     int select = 0;
@@ -59,7 +59,7 @@ int main() {
     //
     // std::cout << screen.ToString() << '\0' << std::endl;
 
-    screen.Loop(renderer);
+    get_screen().Loop(renderer);
     // auto foldermenu = folder_menu(input_data);
     // screen.Loop(foldermenu);
     return EXIT_SUCCESS;

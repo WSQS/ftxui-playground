@@ -11,6 +11,7 @@
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/event.hpp"
+#include "ftxui/component/screen_interactive.hpp"
 using namespace ftxui;
 
 namespace playground
@@ -28,6 +29,11 @@ namespace playground
         std::string log{};
         int selected = 1;
     };
+
+    auto& get_screen() {
+        static auto screen = ScreenInteractive::Fullscreen();
+        return screen;
+    }
 
     inline auto check_parent_sign(const std::shared_ptr<path_data>& input_path_data)
     {
@@ -166,7 +172,7 @@ namespace playground
             switch (event.character()[0])
             {
             case 'q':
-                // screen.Exit();
+                get_screen().Exit();
                 return true;
             case 'c':
                 return true;
@@ -201,11 +207,6 @@ namespace playground
         }
         return data;
     }
-
-
-    Component folder_menu();
-
-    Component folder_menu(path_data data);
 }
 
 
