@@ -48,6 +48,7 @@ int main() {
             select = static_cast<int>(tab_values.size()) - 1;
             return true;
         }
+        // handel log
         if (event.input().size() >= 3 && event.input().substr(0, 3) == "log") {
             log = event.input().substr(3, event.input().size() - 3);
         }
@@ -66,7 +67,5 @@ int main() {
     // std::cout << screen.ToString() << '\0' << std::endl;
 
     get_screen().Loop(renderer);
-    // auto foldermenu = folder_menu(input_data);
-    // screen.Loop(foldermenu);
     return EXIT_SUCCESS;
 }
