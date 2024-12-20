@@ -8,14 +8,19 @@ using namespace ftxui;
 using namespace playground;
 
 
-auto add_folder_menu(std::vector<std::string *> &tab_values, std::vector<std::shared_ptr<path_data> > &path_datas,
-                     Component &tab_container) {
+auto add_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container) {
     auto input_data = Make<path_data>(path_data{
         "/home", {{{".."}}, {Make<int>()}}
     });
-    tab_values = build_tab_value(path_datas);
     path_datas.push_back(input_data);
     tab_container->Add(FileMenu(input_data));
+}
+
+auto remove_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container, int index) {
+    if (path_datas.empty())
+        return;
+    path_datas.erase(path_datas.begin() + index);
+    tab_container->ChildAt(index)->Detach();
 }
 
 int main() {
@@ -23,8 +28,9 @@ int main() {
     int select = 0;
     std::vector<std::string *> tab_values{};
     auto tab_container = Container::Tab({}, &select);
-    add_folder_menu(tab_values, path_datas, tab_container);
-    add_folder_menu(tab_values, path_datas, tab_container);
+    add_folder_menu(path_datas, tab_container);
+    add_folder_menu(path_datas, tab_container);
+    tab_values = build_tab_value(path_datas);
     auto tab_toggle = Toggle(&tab_values, &select);
     auto container = Container::Vertical({
         tab_toggle,
@@ -39,9 +45,18 @@ int main() {
                    build_log(log),
                }) | border;
     }) | CatchEvent([&](const Event &event) {
+        // add tab
         if (event == Event::Character('a')) {
-            // tab_values.push_back("aaa");
-            add_folder_menu(tab_values, path_datas, tab_container);
+            add_folder_menu(path_datas, tab_container);
+            tab_values = build_tab_value(path_datas);
+            // move focus to the last tab
+            select = static_cast<int>(tab_values.size()) - 1;
+            return true;
+        }
+        // remove current tab
+        if (event == Event::Character('d')) {
+            remove_folder_menu(path_datas, tab_container, select);
+            tab_values = build_tab_value(path_datas);
             // move focus to the last tab
             select = static_cast<int>(tab_values.size()) - 1;
             return true;
