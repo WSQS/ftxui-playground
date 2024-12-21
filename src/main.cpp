@@ -68,10 +68,6 @@ int main() {
             log = event.input().substr(3, event.input().size() - 3);
             return true;
         }
-        // if (event == Event::Return) {
-        //     tab_values = build_tab_value(path_datas);
-        //     return false;
-        // }
         return false;
     });
     // Limit the size of the document to 80 char.
