@@ -54,6 +54,7 @@ namespace playground {
 
         std::variant<ConstStringListRef, std::vector<std::string *> *> entries; ///> The list of entries.
         Ref<int> selected = 0; ///> The index of the selected entry.
+        Ref<std::set<int>> toggled{};
 
         // Style:
         UnderlineOption underline;

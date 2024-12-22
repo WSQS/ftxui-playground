@@ -228,6 +228,9 @@ namespace playground {
                 if (event == Event::TabReverse && size()) {
                     selected() = (selected() + size() - 1) % size();
                 }
+                if (event == Event::Character(" ")) {
+                    log("Hello world");
+                }
 
                 selected() = clamp(selected(), 0, size() - 1);
 

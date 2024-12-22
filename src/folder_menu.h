@@ -9,6 +9,8 @@
 #include <vector>
 
 #include "enhanced_menu.h"
+#include "menu_util.h"
+#include "multiselect_menu.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 
@@ -23,15 +25,6 @@ namespace playground {
         menu_data menu{};
         int selected = 1;
     };
-
-    inline auto &get_screen() {
-        static auto screen = ScreenInteractive::Fullscreen();
-        return screen;
-    }
-
-    inline void log(const std::string &log_message) {
-        get_screen().PostEvent(Event::Special("log" + log_message));
-    }
 
     inline auto check_parent_sign(const std::shared_ptr<path_data> &input_path_data) {
         if (std::filesystem::path(input_path_data->file_path).root_directory() == input_path_data->
@@ -97,7 +90,7 @@ namespace playground {
     };
 
     inline auto get_menu(const std::shared_ptr<path_data> &input_path_data) {
-        enhanced_menu_option menu_option{enhanced_menu_option::Vertical()};
+        multiselect_menu_option menu_option{multiselect_menu_option::Vertical()};
         // handel menu enter
         menu_option.on_enter = [input_data=input_path_data]() {
             handle_path_existence(input_data);
@@ -108,8 +101,8 @@ namespace playground {
             check_parent_sign(input_data);
             handel_file_type(input_data);
         };
-        return enhanced_menu(&*input_path_data->menu.entries, input_path_data->menu.selected.get(),
-                             menu_option);
+        return multiselect_menu(&*input_path_data->menu.entries, input_path_data->menu.selected.get(),
+                                menu_option);
     }
 
     inline auto input_transform(InputState state) {

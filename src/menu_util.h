@@ -5,6 +5,7 @@
 #ifndef MENU_UTIL_H
 #define MENU_UTIL_H
 #include "ftxui/component/component.hpp"
+#include "ftxui/component/screen_interactive.hpp"
 using namespace ftxui;
 
 namespace playground {
@@ -48,6 +49,15 @@ namespace playground {
     template<class T>
     constexpr const T &clamp(const T &v, const T &lo, const T &hi) {
         return v < lo ? lo : hi < v ? hi : v;
+    }
+
+    inline auto &get_screen() {
+        static auto screen = ScreenInteractive::Fullscreen();
+        return screen;
+    }
+
+    inline void log(const std::string &log_message) {
+        get_screen().PostEvent(Event::Special("log" + log_message));
     }
 }
 #endif //MENU_UTIL_H
