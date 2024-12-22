@@ -78,14 +78,15 @@ namespace playground {
                 if (i != 0 && elements_infix) {
                     elements.push_back(elements_infix());
                 }
-                const bool is_focused = focused_entry() == i && is_menu_focused;
-                const bool is_selected = toggled->count(i);
+                const bool is_focused = (focused_entry() == i) && is_menu_focused;
+                const bool is_selected = (selected() == i);
+                const bool is_toggled = toggled().count(i);
 
                 const multiselect_entry_state state = {
                     std::holds_alternative<ConstStringListRef>(entries)
                         ? std::get<ConstStringListRef>(entries)[i]
                         : *(*std::get<std::vector<std::string *> *>(entries))[i],
-                    false, is_selected, is_focused, i,
+                    false, is_selected, is_focused, is_toggled, i,
                 };
 
                 auto focus_management = (selected_focus_ != i)

@@ -17,6 +17,7 @@ namespace playground {
         bool state;         ///< The state of the button/checkbox/radiobox
         bool active;        ///< Whether the entry is the active one.
         bool focused;       ///< Whether the entry is one focused by the user.
+        bool toggled;       ///< Whether the entry is toggled
         int index;          ///< Index of the entry when applicable or -1.
     };
     struct multiselect_menu_entry_option {
@@ -57,6 +58,9 @@ namespace playground {
                 }
                 if (state.active) {
                     e |= bold;
+                }
+                if (state.toggled) {
+                    e |= inverted;
                 }
                 if (!state.focused && !state.active) {
                     e |= dim;
