@@ -447,13 +447,13 @@ namespace playground {
     };
 
     // NOLINTNEXTLINE
-    Component enhanced_menu(multiselect_menu_option option) {
+    Component multiselect_menu(multiselect_menu_option option) {
         return Make<multiselect_menu_base>(std::move(option));
     }
 
-    Component enhanced_menu(ConstStringListRef entries, int *selected, multiselect_menu_option option) {
+    Component multiselect_menu(ConstStringListRef entries, int *selected, multiselect_menu_option option) {
         option.entries = std::move(entries);
         option.selected = selected;
-        return enhanced_menu(option);
+        return multiselect_menu(option);
     }
 } // playground

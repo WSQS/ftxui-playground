@@ -53,12 +53,6 @@ namespace playground {
 
         static multiselect_menu_option VerticalAnimated();
 
-        static multiselect_menu_option Toggle() {
-            auto option = multiselect_menu_option::Horizontal();
-            option.elements_infix = [] { return text("│") | automerge; };
-            return option;
-        };
-
         std::variant<ConstStringListRef, std::vector<std::string *> *> entries; ///> The list of entries.
         Ref<int> selected = 0; ///> The index of the selected entry.
 
@@ -76,9 +70,9 @@ namespace playground {
         Ref<int> focused_entry = 0;
     };
 
-    Component enhanced_menu(multiselect_menu_option options);
+    Component multiselect_menu(multiselect_menu_option options);
 
-    Component enhanced_menu(ConstStringListRef entries,
+    Component multiselect_menu(ConstStringListRef entries,
                             int *selected_,
                             multiselect_menu_option options = multiselect_menu_option::Vertical());
 }
