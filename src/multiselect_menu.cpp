@@ -197,7 +197,15 @@ namespace playground {
             }
         }
 
+        bool IsTogglable() {
+            return (std::holds_alternative<ConstStringListRef>(entries)
+                        ? std::get<ConstStringListRef>(entries)[selected()]
+                        : *(*std::get<std::vector<std::string *> *>(entries))[selected()]) != "..";
+        }
+
         void ToggleSelected() {
+            if (!IsTogglable())
+                return;
             if (toggled->count(selected()))
                 toggled->erase(selected());
             else
