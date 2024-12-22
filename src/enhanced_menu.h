@@ -81,7 +81,7 @@ namespace playground {
 
     Component enhanced_menu(ConstStringListRef entries,
                             int *selected_,
-                            playground::enhanced_menu_option options = enhanced_menu_option::Vertical());
+                            enhanced_menu_option options = enhanced_menu_option::Vertical());
 
     Component Toggle(ConstStringListRef entries, int *selected);
 
