@@ -1,7 +1,5 @@
 #include <filesystem>
-#include <iostream>
 #include "folder_menu.h"
-#include "ftxui/component/component.hpp"
 
 
 using namespace ftxui;

@@ -472,9 +472,9 @@ namespace playground {
         }
 
         int size() const {
-            return std::holds_alternative<ConstStringListRef>(entries)
+            return static_cast<int>(std::holds_alternative<ConstStringListRef>(entries)
                        ? std::get<ConstStringListRef>(entries).size()
-                       : std::get<std::vector<std::string *> *>(entries)->size();
+                       : std::get<std::vector<std::string *> *>(entries)->size());
         }
 
         float FirstTarget() {
