@@ -185,6 +185,13 @@ namespace playground {
             }
         }
 
+        void ToggleSelected() {
+            if (toggled->count(selected()))
+                toggled->erase(selected());
+            else
+                toggled->insert(selected());
+        };
+
         // NOLINTNEXTLINE(readability-function-cognitive-complexity)
         bool OnEvent(Event event) override {
             Clamp();
@@ -229,7 +236,8 @@ namespace playground {
                     selected() = (selected() + size() - 1) % size();
                 }
                 if (event == Event::Character(" ")) {
-                    log("Hello world");
+                    ToggleSelected();
+                    log(std::to_string(toggled->size()));
                 }
 
                 selected() = clamp(selected(), 0, size() - 1);
