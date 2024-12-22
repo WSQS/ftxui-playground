@@ -70,7 +70,7 @@ namespace playground {
             return option;
         }
 
-        std::variant<ConstStringListRef, std::vector<std::string *> *> entries; ///> The list of entries.
+        Ref<std::vector<reference<std::string>>> entries; ///> The list of entries.
         Ref<int> selected = 0; ///> The index of the selected entry.
         Ref<std::set<int>> toggled{};
 
@@ -90,7 +90,7 @@ namespace playground {
 
     Component multiselect_menu(multiselect_menu_option options);
 
-    Component multiselect_menu(ConstStringListRef entries,
+    Component multiselect_menu(Ref<std::vector<reference<std::string>>> entries,
                                int *selected_,
                                multiselect_menu_option options = multiselect_menu_option::Vertical());
 }

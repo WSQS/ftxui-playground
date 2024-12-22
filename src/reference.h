@@ -15,8 +15,8 @@ class reference {
         return std::holds_alternative<T>(value)
                    ? &std::get<T>(value)
                    : std::holds_alternative<T *>(value)
-                         ? std::get<const T *>(value)
-                         : std::get<std::shared_ptr<T> >(value);
+                         ? std::get<T *>(value)
+                         : std::get<std::shared_ptr<T> >(value).get();
     }
 
 public:

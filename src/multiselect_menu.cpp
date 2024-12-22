@@ -84,9 +84,7 @@ namespace playground {
                 const bool is_toggled = toggled().count(i);
 
                 const multiselect_entry_state state = {
-                    std::holds_alternative<ConstStringListRef>(entries)
-                        ? std::get<ConstStringListRef>(entries)[i]
-                        : *(*std::get<std::vector<std::string *> *>(entries))[i],
+                    (*entries)[i](),
                     false, is_selected, is_focused, is_toggled, i,
                 };
 
@@ -199,9 +197,7 @@ namespace playground {
         }
 
         bool IsTogglable() {
-            return (std::holds_alternative<ConstStringListRef>(entries)
-                        ? std::get<ConstStringListRef>(entries)[selected()]
-                        : *(*std::get<std::vector<std::string *> *>(entries))[selected()]) != "..";
+            return (*entries)[selected()]() != "..";
         }
 
         void ToggleSelected() {
@@ -428,15 +424,11 @@ namespace playground {
         }
 
         bool Focusable() const final {
-            return std::holds_alternative<ConstStringListRef>(entries)
-                       ? std::get<ConstStringListRef>(entries).size()
-                       : std::get<std::vector<std::string *> *>(entries)->size();
+            return entries().size();
         }
 
         int size() const {
-            return static_cast<int>(std::holds_alternative<ConstStringListRef>(entries)
-                                        ? std::get<ConstStringListRef>(entries).size()
-                                        : std::get<std::vector<std::string *> *>(entries)->size());
+            return static_cast<int>(entries().size());
         }
 
         float FirstTarget() {
@@ -483,7 +475,7 @@ namespace playground {
         return Make<multiselect_menu_base>(std::move(option));
     }
 
-    Component multiselect_menu(ConstStringListRef entries, int *selected, multiselect_menu_option option) {
+    Component multiselect_menu(Ref<std::vector<reference<std::string>>> entries, int *selected, multiselect_menu_option option) {
         option.entries = std::move(entries);
         option.selected = selected;
         return multiselect_menu(option);
