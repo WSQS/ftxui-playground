@@ -9,7 +9,6 @@
 #include "ftxui/component/event.hpp"
 
 namespace playground {
-
     inline Element default_option_transform(const multiselect_entry_state &state) {
         std::string label = (state.active ? "> " : "  ") + state.label; // NOLINT
         Element e = text(std::move(label));
@@ -79,8 +78,8 @@ namespace playground {
                 if (i != 0 && elements_infix) {
                     elements.push_back(elements_infix());
                 }
-                const bool is_focused = (focused_entry() == i) && is_menu_focused;
-                const bool is_selected = (selected() == i);
+                const bool is_focused = focused_entry() == i && is_menu_focused;
+                const bool is_selected = toggled->count(i);
 
                 const multiselect_entry_state state = {
                     std::holds_alternative<ConstStringListRef>(entries)
@@ -96,10 +95,9 @@ namespace playground {
                                                   : ftxui::select;
 
                 const Element element =
-                        (entries_option.transform
-                             ? entries_option.transform
-                             : default_option_transform) //
-                        (state);
+                (entries_option.transform
+                     ? entries_option.transform
+                     : default_option_transform)(state);
                 elements.push_back(element | AnimatedColorStyle(i) | reflect(boxes_[i]) |
                                    focus_management);
             }
