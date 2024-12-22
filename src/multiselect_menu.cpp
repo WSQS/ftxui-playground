@@ -2,16 +2,16 @@
 // Created by sophomore on 12/22/24.
 //
 
-#include "enhanced_menu.h"
+#include "multiselect_menu.h"
 #include "menu_util.h"
 #include "ftxui/component/event.hpp"
 
 namespace playground {
     /// @brief A list of items. The user can navigate through them.
     /// @ingroup component
-    class enhanced_menu_base : public ComponentBase, public enhanced_menu_option {
+    class multiselect_menu_base : public ComponentBase, public multiselect_menu_option {
     public:
-        explicit enhanced_menu_base(const enhanced_menu_option &option) : enhanced_menu_option(option) {
+        explicit multiselect_menu_base(const multiselect_menu_option &option) : multiselect_menu_option(option) {
         }
 
         bool IsHorizontal() { return playground::IsHorizontal(direction); }
@@ -445,22 +445,11 @@ namespace playground {
     };
 
     // NOLINTNEXTLINE
-    Component enhanced_menu(enhanced_menu_option option) {
-        return Make<enhanced_menu_base>(std::move(option));
+    Component enhanced_menu(multiselect_menu_option option) {
+        return Make<multiselect_menu_base>(std::move(option));
     }
 
-    Component enhanced_menu(ConstStringListRef entries, int *selected, enhanced_menu_option option) {
-        option.entries = std::move(entries);
-        option.selected = selected;
-        return enhanced_menu(option);
-    }
-
-    Component Toggle(ConstStringListRef entries, int *selected) {
-        return enhanced_menu(std::move(entries), selected, enhanced_menu_option::Toggle());
-    }
-
-    Component Toggle(std::vector<std::string *> *entries, int *selected) {
-        auto option = enhanced_menu_option::Toggle();
+    Component enhanced_menu(ConstStringListRef entries, int *selected, multiselect_menu_option option) {
         option.entries = std::move(entries);
         option.selected = selected;
         return enhanced_menu(option);
