@@ -1,8 +1,10 @@
 //
 // Created by sophomore on 12/22/24.
 //
-
 #include "multiselect_menu.h"
+
+#include <algorithm>
+
 #include "menu_util.h"
 #include "ftxui/component/event.hpp"
 
