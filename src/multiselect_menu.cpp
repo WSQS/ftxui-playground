@@ -247,10 +247,6 @@ namespace playground {
                 if (event == Event::TabReverse && size()) {
                     selected() = (selected() + size() - 1) % size();
                 }
-                if (event == Event::Character(" ")) {
-                    ToggleSelected();
-                    log(std::to_string(toggled->size()));
-                }
 
                 selected() = clamp(selected(), 0, size() - 1);
 
@@ -258,6 +254,10 @@ namespace playground {
                     focused_entry() = selected();
                     SelectedTakeFocus();
                     OnChange();
+                    return true;
+                }
+                if (event == Event::Character(" ")) {
+                    ToggleSelected();
                     return true;
                 }
             }
