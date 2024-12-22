@@ -1,27 +1,8 @@
 #include <filesystem>
 #include "folder_menu.h"
 
-
 using namespace ftxui;
 using namespace playground;
-
-
-auto add_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container) {
-    auto input_data = Make<path_data>(path_data{
-        "/home", {{{".."}}, {Make<int>()}}
-    });
-    path_datas.push_back(input_data);
-    tab_container->Add(FileMenu(input_data));
-}
-
-auto remove_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container, int index) {
-    if (path_datas.empty()) {
-        log("There is not tab anymore");
-        return;
-    }
-    path_datas.erase(path_datas.begin() + index);
-    tab_container->ChildAt(index)->Detach();
-}
 
 int main() {
     std::vector<std::shared_ptr<path_data> > path_datas;
@@ -41,7 +22,7 @@ int main() {
         return vbox({
                    tab_toggle->Render(),
                    separator(),
-                   tab_container->Render()|flex,
+                   tab_container->Render() | flex,
                    build_log(log),
                }) | border;
     }) | CatchEvent([&](const Event &event) {

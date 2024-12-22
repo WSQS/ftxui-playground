@@ -111,7 +111,7 @@ namespace playground {
         return screen;
     }
 
-    inline void log(std::string log_message) {
+    inline void log(const std::string& log_message) {
         get_screen().PostEvent(Event::Special("log" + log_message));
     }
 
@@ -259,6 +259,22 @@ namespace playground {
             data.push_back(&path_data->file_path);
         }
         return data;
+    }
+    inline auto add_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container) {
+        auto input_data = Make<path_data>(path_data{
+            "/home", {{{".."}}, {Make<int>()}}
+        });
+        path_datas.push_back(input_data);
+        tab_container->Add(FileMenu(input_data));
+    }
+
+    inline auto remove_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container, int index) {
+        if (path_datas.empty()) {
+            log("There is not tab anymore");
+            return;
+        }
+        path_datas.erase(path_datas.begin() + index);
+        tab_container->ChildAt(index)->Detach();
     }
 }
 
