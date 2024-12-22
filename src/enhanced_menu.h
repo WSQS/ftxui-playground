@@ -7,8 +7,9 @@
 #include "ftxui/component/component.hpp"
 
 using namespace ftxui;
+
 namespace playground {
-struct enhanced_menu_option {
+    struct enhanced_menu_option {
         // Standard constructors:
         static enhanced_menu_option Horizontal() {
             enhanced_menu_option option;
@@ -85,7 +86,6 @@ struct enhanced_menu_option {
     Component Toggle(ConstStringListRef entries, int *selected);
 
     Component Toggle(std::vector<std::string *> *entries, int *selected);
-
 } // playground
 
 #endif //ENHANCED_MENU_H

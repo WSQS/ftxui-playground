@@ -7,7 +7,7 @@
 #include "ftxui/component/event.hpp"
 
 namespace playground {
-        Element DefaultOptionTransform(const EntryState &state) {
+    Element DefaultOptionTransform(const EntryState &state) {
         std::string label = (state.active ? "> " : "  ") + state.label; // NOLINT
         Element e = text(std::move(label));
         if (state.focused) {
