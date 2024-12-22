@@ -11,12 +11,26 @@
 using namespace ftxui;
 
 namespace playground {
+
+    struct multiselect_entry_state {
+        std::string label;  ///< The label to display.
+        bool state;         ///< The state of the button/checkbox/radiobox
+        bool active;        ///< Whether the entry is the active one.
+        bool focused;       ///< Whether the entry is one focused by the user.
+        int index;          ///< Index of the entry when applicable or -1.
+    };
+    struct multiselect_menu_entry_option {
+        ConstStringRef label = "MenuEntry";
+        std::function<Element(const multiselect_entry_state& state)> transform;
+        AnimatedColorsOption animated_colors;
+    };
+
     struct multiselect_menu_option {
         // Standard constructors:
         static multiselect_menu_option Horizontal() {
             multiselect_menu_option option;
             option.direction = ftxui::Direction::Right;
-            option.entries_option.transform = [](const EntryState &state) {
+            option.entries_option.transform = [](const multiselect_entry_state &state) {
                 Element e = text(state.label);
                 if (state.focused) {
                     e |= inverted;
@@ -36,7 +50,7 @@ namespace playground {
 
         static multiselect_menu_option Vertical() {
             multiselect_menu_option option;
-            option.entries_option.transform = [](const EntryState &state) {
+            option.entries_option.transform = [](const multiselect_entry_state &state) {
                 Element e = text((state.active ? "> " : "  ") + state.label); // NOLINT
                 if (state.focused) {
                     e |= inverted;
@@ -58,7 +72,7 @@ namespace playground {
 
         // Style:
         UnderlineOption underline;
-        MenuEntryOption entries_option;
+        multiselect_menu_entry_option entries_option;
         Direction direction = Direction::Down;
         std::function<Element()> elements_prefix;
         std::function<Element()> elements_infix;

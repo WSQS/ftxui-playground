@@ -9,6 +9,19 @@
 #include "ftxui/component/event.hpp"
 
 namespace playground {
+
+    inline Element default_option_transform(const multiselect_entry_state &state) {
+        std::string label = (state.active ? "> " : "  ") + state.label; // NOLINT
+        Element e = text(std::move(label));
+        if (state.focused) {
+            e = e | inverted;
+        }
+        if (state.active) {
+            e = e | bold;
+        }
+        return e;
+    }
+
     /// @brief A list of items. The user can navigate through them.
     /// @ingroup component
     class multiselect_menu_base : public ComponentBase, public multiselect_menu_option {
@@ -69,7 +82,7 @@ namespace playground {
                 const bool is_focused = (focused_entry() == i) && is_menu_focused;
                 const bool is_selected = (selected() == i);
 
-                const EntryState state = {
+                const multiselect_entry_state state = {
                     std::holds_alternative<ConstStringListRef>(entries)
                         ? std::get<ConstStringListRef>(entries)[i]
                         : *(*std::get<std::vector<std::string *> *>(entries))[i],
@@ -85,7 +98,7 @@ namespace playground {
                 const Element element =
                         (entries_option.transform
                              ? entries_option.transform
-                             : DefaultOptionTransform) //
+                             : default_option_transform) //
                         (state);
                 elements.push_back(element | AnimatedColorStyle(i) | reflect(boxes_[i]) |
                                    focus_management);
