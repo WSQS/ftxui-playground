@@ -6,7 +6,7 @@
 #define MULTISELECT_MENU_H
 
 #include <set>
-
+#include "reference.h"
 #include "ftxui/component/component.hpp"
 using namespace ftxui;
 

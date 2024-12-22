@@ -6,5 +6,4 @@
 using namespace ftxui;
 
 namespace playground {
-
 } // namespace ftxui
