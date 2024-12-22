@@ -1,11 +1,6 @@
 //
 // Created by sophomore on 12/15/24.
 //
-
-
-// Copyright 2020 Arthur Sonzogni. All rights reserved.
-// Use of this source code is governed by the MIT license that can be found in
-// the LICENSE file.
 #include "folder_menu.h"
 #include <algorithm>                // for max, fill_n, reverse
 #include <chrono>                   // for milliseconds
@@ -21,14 +16,18 @@
 #include "ftxui/component/component_options.hpp"  // for MenuOption, MenuEntryOption, UnderlineOption, AnimatedColorOption, AnimatedColorsOption, EntryState
 
 
+
 #include "ftxui/component/event.hpp"  // for Event, Event::ArrowDown, Event::ArrowLeft, Event::ArrowRight, Event::ArrowUp, Event::End, Event::Home, Event::PageDown, Event::PageUp, Event::Return, Event::Tab, Event::TabReverse
+
 
 
 #include "ftxui/component/mouse.hpp"  // for Mouse, Mouse::Left, Mouse::Released, Mouse::WheelDown, Mouse::WheelUp, Mouse::None
 
 
+
 #include "ftxui/component/screen_interactive.hpp"  // for Component
 #include "ftxui/dom/elements.hpp"  // for operator|, Element, reflect, Decorator, nothing, Elements, bgcolor, color, hbox, separatorHSelector, separatorVSelector, vbox, xflex, yflex, text, bold, focus, inverted, select
+
 
 
 #include "ftxui/screen/box.hpp"    // for Box
@@ -38,32 +37,6 @@
 using namespace ftxui;
 
 namespace playground {
-    MenuOption MenuOption::Vertical() {
-        MenuOption option;
-        option.entries_option.transform = [](const EntryState& state) {
-            Element e = text((state.active ? "> " : "  ") + state.label);  // NOLINT
-            if (state.focused) {
-                e |= inverted;
-            }
-            if (state.active) {
-                e |= bold;
-            }
-            if (!state.focused && !state.active) {
-                e |= dim;
-            }
-            return e;
-        };
-        return option;
-    }
-    /// @brief Standard options for a horitontal menu with some separator.
-    /// This can be useful to implement a tab bar.
-    /// @ingroup component
-    // static
-    MenuOption MenuOption::Toggle() {
-        auto option = MenuOption::Horizontal();
-        option.elements_infix = [] { return text("│") | automerge; };
-        return option;
-    }
     Element DefaultOptionTransform(const EntryState &state) {
         std::string label = (state.active ? "> " : "  ") + state.label; // NOLINT
         Element e = text(std::move(label));
@@ -75,30 +48,7 @@ namespace playground {
         }
         return e;
     }
-    /// @brief Standard options for an horizontal menu.
-    /// This can be useful to implement a tab bar.
-    /// @ingroup component
-    // static
-    MenuOption MenuOption::Horizontal() {
-        MenuOption option;
-        option.direction = Direction::Right;
-        option.entries_option.transform = [](const EntryState& state) {
-            Element e = text(state.label);
-            if (state.focused) {
-                e |= inverted;
-            }
-            if (state.active) {
-                e |= bold;
-            }
-            if (!state.focused && !state.active) {
-                e |= dim;
-            }
-            return e;
-        };
-        option.elements_infix = [] { return text(" "); };
 
-        return option;
-    }
     bool IsInverted(Direction direction) {
         switch (direction) {
             case Direction::Up:
@@ -124,15 +74,16 @@ namespace playground {
     }
 
     // Similar to std::clamp, but allow hi to be lower than lo.
-    template <class T>
-    constexpr const T& clamp(const T& v, const T& lo, const T& hi) {
+    template<class T>
+    constexpr const T &clamp(const T &v, const T &lo, const T &hi) {
         return v < lo ? lo : hi < v ? hi : v;
     }
+
     /// @brief A list of items. The user can navigate through them.
     /// @ingroup component
-    class enhanced_menu_base : public ComponentBase, public MenuOption {
+    class enhanced_menu_base : public ComponentBase, public enhanced_menu_option {
     public:
-        explicit enhanced_menu_base(const MenuOption &option) : MenuOption(option) {
+        explicit enhanced_menu_base(const enhanced_menu_option &option) : enhanced_menu_option(option) {
         }
 
         bool IsHorizontal() { return playground::IsHorizontal(direction); }
@@ -594,7 +545,7 @@ namespace playground {
     ///   entry 3
     /// ```
     // NOLINTNEXTLINE
-    Component enhanced_menu(MenuOption option) {
+    Component enhanced_menu(enhanced_menu_option option) {
         return Make<enhanced_menu_base>(std::move(option));
     }
 
@@ -625,10 +576,10 @@ namespace playground {
     ///   entry 2
     ///   entry 3
     /// ```
-    Component enhanced_menu(ConstStringListRef entries, int *selected, playground::MenuOption option) {
+    Component enhanced_menu(ConstStringListRef entries, int *selected, enhanced_menu_option option) {
         option.entries = std::move(entries);
         option.selected = selected;
-        return playground::enhanced_menu(option);
+        return enhanced_menu(option);
     }
 
     /// @brief An horizontal list of elements. The user can navigate through them.
@@ -637,7 +588,7 @@ namespace playground {
     /// See also |Menu|.
     /// @ingroup component
     Component Toggle(ConstStringListRef entries, int *selected) {
-        return playground::enhanced_menu(std::move(entries), selected, MenuOption::Toggle());
+        return enhanced_menu(std::move(entries), selected, enhanced_menu_option::Toggle());
     }
 
     /// @brief An horizontal list of elements. The user can navigate through them.
@@ -646,163 +597,10 @@ namespace playground {
     /// See also |Menu|.
     /// @ingroup component
     Component Toggle(std::vector<std::string *> *entries, int *selected) {
-        auto option = MenuOption::Toggle();
+        auto option = enhanced_menu_option::Toggle();
         option.entries = std::move(entries);
         option.selected = selected;
-        return playground::enhanced_menu(option);
+        return enhanced_menu(option);
     }
 
-    /// @brief A specific menu entry. They can be put into a Container::Vertical to
-    /// form a menu.
-    /// @param label The text drawn representing this element.
-    /// @param option Additional optional parameters.
-    /// @ingroup component
-    ///
-    /// ### Example
-    ///
-    /// ```cpp
-    /// auto screen = ScreenInteractive::TerminalOutput();
-    /// int selected = 0;
-    /// auto menu = Container::Vertical({
-    ///    MenuEntry("entry 1"),
-    ///    MenuEntry("entry 2"),
-    ///    MenuEntry("entry 3"),
-    /// }, &selected);
-    /// screen.Loop(menu);
-    /// ```
-    ///
-    /// ### Output
-    ///
-    /// ```bash
-    /// > entry 1
-    ///   entry 2
-    ///   entry 3
-    /// ```
-    Component MenuEntry(ConstStringRef label, MenuEntryOption option) {
-        option.label = std::move(label);
-        return playground::MenuEntry(std::move(option));
-    }
-
-    /// @brief A specific menu entry. They can be put into a Container::Vertical to
-    /// form a menu.
-    /// @param option The parameters.
-    /// @ingroup component
-    ///
-    /// ### Example
-    ///
-    /// ```cpp
-    /// auto screen = ScreenInteractive::TerminalOutput();
-    /// int selected = 0;
-    /// auto menu = Container::Vertical({
-    ///    MenuEntry({.label = "entry 1"}),
-    ///    MenuEntry({.label = "entry 2"}),
-    ///    MenuEntry({.label = "entry 3"}),
-    /// }, &selected);
-    /// screen.Loop(menu);
-    /// ```
-    ///
-    /// ### Output
-    ///
-    /// ```bash
-    /// > entry 1
-    ///   entry 2
-    ///   entry 3
-    /// ```
-    Component MenuEntry(MenuEntryOption option) {
-        class Impl : public ComponentBase, public MenuEntryOption {
-        public:
-            explicit Impl(MenuEntryOption option)
-                : MenuEntryOption(std::move(option)) {
-            }
-
-        private:
-            Element Render() override {
-                const bool focused = Focused();
-                UpdateAnimationTarget();
-
-                const EntryState state{
-                    label(), false, hovered_, focused, Index(),
-                };
-
-                const Element element =
-                        (transform ? transform : DefaultOptionTransform) //
-                        (state);
-
-                auto focus_management = focused ? ftxui::select : nothing;
-                return element | AnimatedColorStyle() | focus_management | reflect(box_);
-            }
-
-            void UpdateAnimationTarget() {
-                const bool focused = Focused();
-                float target = focused ? 1.F : hovered_ ? 0.5F : 0.F; // NOLINT
-                if (target == animator_background_.to()) {
-                    return;
-                }
-                animator_background_ = animation::Animator(
-                    &animation_background_, target, animated_colors.background.duration,
-                    animated_colors.background.function);
-                animator_foreground_ = animation::Animator(
-                    &animation_foreground_, target, animated_colors.foreground.duration,
-                    animated_colors.foreground.function);
-            }
-
-            Decorator AnimatedColorStyle() {
-                Decorator style = nothing;
-                if (animated_colors.foreground.enabled) {
-                    style = style |
-                            color(Color::Interpolate(animation_foreground_,
-                                                     animated_colors.foreground.inactive,
-                                                     animated_colors.foreground.active));
-                }
-
-                if (animated_colors.background.enabled) {
-                    style = style |
-                            bgcolor(Color::Interpolate(animation_background_,
-                                                       animated_colors.background.inactive,
-                                                       animated_colors.background.active));
-                }
-                return style;
-            }
-
-            bool Focusable() const override { return true; }
-
-            bool OnEvent(Event event) override {
-                if (!event.is_mouse()) {
-                    return false;
-                }
-
-                hovered_ = box_.Contain(event.mouse().x, event.mouse().y);
-
-                if (!hovered_) {
-                    return false;
-                }
-
-                if (event.mouse().button == Mouse::Left &&
-                    event.mouse().motion == Mouse::Pressed) {
-                    TakeFocus();
-                    return true;
-                }
-
-                return false;
-            }
-
-            void OnAnimation(animation::Params &params) override {
-                animator_background_.OnAnimation(params);
-                animator_foreground_.OnAnimation(params);
-            }
-
-            MenuEntryOption option_;
-            Box box_;
-            bool hovered_ = false;
-
-            float animation_background_ = 0.F;
-            float animation_foreground_ = 0.F;
-            animation::Animator animator_background_ =
-                    animation::Animator(&animation_background_, 0.F);
-            animation::Animator animator_foreground_ =
-                    animation::Animator(&animation_foreground_, 0.F);
-        };
-
-        return Make<Impl>(std::move(option));
-    }
 } // namespace ftxui

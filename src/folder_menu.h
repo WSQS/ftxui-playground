@@ -15,40 +15,61 @@
 using namespace ftxui;
 
 namespace playground {
-    struct UnderlineOption {
-        bool enabled = false;
-
-        Color color_active = Color::White;
-        Color color_inactive = Color::GrayDark;
-
-        animation::easing::Function leader_function =
-            animation::easing::QuadraticInOut;
-        animation::easing::Function follower_function =
-            animation::easing::QuadraticInOut;
-
-        animation::Duration leader_duration = std::chrono::milliseconds(250);
-        animation::Duration leader_delay = std::chrono::milliseconds(0);
-        animation::Duration follower_duration = std::chrono::milliseconds(250);
-        animation::Duration follower_delay = std::chrono::milliseconds(0);
-
-        void SetAnimation(animation::Duration d, animation::easing::Function f);
-        void SetAnimationDuration(animation::Duration d);
-        void SetAnimationFunction(animation::easing::Function f);
-        void SetAnimationFunction(animation::easing::Function f_leader,
-                                  animation::easing::Function f_follower);
-    };
     /// @brief Option for the Menu component.
     /// @ingroup component
-    struct MenuOption {
+    struct enhanced_menu_option {
         // Standard constructors:
-        static MenuOption Horizontal();
-        static MenuOption HorizontalAnimated();
-        static MenuOption Vertical();
-        static MenuOption VerticalAnimated();
-        static MenuOption Toggle();
+        static enhanced_menu_option Horizontal() {
+            enhanced_menu_option option;
+            option.direction = Direction::Right;
+            option.entries_option.transform = [](const EntryState &state) {
+                Element e = text(state.label);
+                if (state.focused) {
+                    e |= inverted;
+                }
+                if (state.active) {
+                    e |= bold;
+                }
+                if (!state.focused && !state.active) {
+                    e |= dim;
+                }
+                return e;
+            };
+            option.elements_infix = [] { return text(" "); };
 
-        std::variant<ConstStringListRef,std::vector<std::string*>*> entries;  ///> The list of entries.
-        Ref<int> selected = 0;       ///> The index of the selected entry.
+            return option;
+        };
+
+        static enhanced_menu_option HorizontalAnimated();
+
+        static enhanced_menu_option Vertical() {
+            enhanced_menu_option option;
+            option.entries_option.transform = [](const EntryState &state) {
+                Element e = text((state.active ? "> " : "  ") + state.label); // NOLINT
+                if (state.focused) {
+                    e |= inverted;
+                }
+                if (state.active) {
+                    e |= bold;
+                }
+                if (!state.focused && !state.active) {
+                    e |= dim;
+                }
+                return e;
+            };
+            return option;
+        };
+
+        static enhanced_menu_option VerticalAnimated();
+
+        static enhanced_menu_option Toggle() {
+            auto option = enhanced_menu_option::Horizontal();
+            option.elements_infix = [] { return text("│") | automerge; };
+            return option;
+        };
+
+        std::variant<ConstStringListRef, std::vector<std::string *> *> entries; ///> The list of entries.
+        Ref<int> selected = 0; ///> The index of the selected entry.
 
         // Style:
         UnderlineOption underline;
@@ -59,15 +80,19 @@ namespace playground {
         std::function<Element()> elements_postfix;
 
         // Observers:
-        std::function<void()> on_change;  ///> Called when the selected entry changes.
-        std::function<void()> on_enter;   ///> Called when the user presses enter.
+        std::function<void()> on_change; ///> Called when the selected entry changes.
+        std::function<void()> on_enter; ///> Called when the user presses enter.
         Ref<int> focused_entry = 0;
     };
-    Component enhanced_menu(MenuOption options);
+
+    Component enhanced_menu(enhanced_menu_option options);
+
     Component enhanced_menu(ConstStringListRef entries,
-                   int* selected_,
-                   playground::MenuOption options = MenuOption::Vertical());
+                            int *selected_,
+                            playground::enhanced_menu_option options = enhanced_menu_option::Vertical());
+
     Component MenuEntry(MenuEntryOption options);
+
     Component MenuEntry(ConstStringRef label, MenuEntryOption options = {});
 
     struct menu_data {
@@ -154,7 +179,7 @@ namespace playground {
     };
 
     inline auto get_menu(const std::shared_ptr<path_data> &input_path_data) {
-        MenuOption menu_option{MenuOption::Vertical()};
+        enhanced_menu_option menu_option{enhanced_menu_option::Vertical()};
         // handel menu enter
         menu_option.on_enter = [input_data=input_path_data]() {
             handle_path_existence(input_data);
@@ -166,7 +191,7 @@ namespace playground {
             handel_file_type(input_data);
         };
         return enhanced_menu(&*input_path_data->menu.entries, input_path_data->menu.selected.get(),
-                    menu_option);
+                             menu_option);
     }
 
     inline auto input_transform(InputState state) {
@@ -235,7 +260,6 @@ namespace playground {
         }
         return data;
     }
-
 }
 
 
