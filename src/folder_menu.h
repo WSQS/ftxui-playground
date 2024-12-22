@@ -16,7 +16,7 @@
 
 namespace playground {
     struct menu_data {
-        std::vector<reference<std::string>> entries{};
+        std::vector<reference<std::string> > entries{};
         std::shared_ptr<int> selected{};
     };
 
@@ -171,10 +171,17 @@ namespace playground {
         return data;
     }
 
-    inline auto add_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container) {
-        auto input_data = Make<path_data>(path_data{
-            "/home", {{{{".."}}}, {Make<int>()}}
-        });
+    inline auto add_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container,
+                                int index) {
+        std::shared_ptr<path_data> input_data;
+        if (path_datas.empty())
+            input_data = Make<path_data>(path_data{
+                "/home", {{{{".."}}}, {Make<int>()}}
+            });
+        else
+            input_data = Make<path_data>(path_data{
+                path_datas[index]->file_path, {{{{".."}}}, {Make<int>()}}
+            });
         path_datas.push_back(input_data);
         tab_container->Add(FileMenu(input_data));
     }

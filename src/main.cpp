@@ -9,8 +9,8 @@ int main() {
     int select = 0;
     std::vector<std::string *> tab_values{};
     auto tab_container = Container::Tab({}, &select);
-    add_folder_menu(path_datas, tab_container);
-    add_folder_menu(path_datas, tab_container);
+    add_folder_menu(path_datas, tab_container, select);
+    add_folder_menu(path_datas, tab_container, select);
     tab_values = build_tab_value(path_datas);
     auto tab_toggle = playground::Toggle(&tab_values, &select);
     auto container = Container::Vertical({
@@ -28,7 +28,7 @@ int main() {
     }) | CatchEvent([&](const Event &event) {
         // add tab
         if (event == Event::Character('a')) {
-            add_folder_menu(path_datas, tab_container);
+            add_folder_menu(path_datas, tab_container, select);
             tab_values = build_tab_value(path_datas);
             // move focus to the last tab
             select = static_cast<int>(tab_values.size()) - 1;
