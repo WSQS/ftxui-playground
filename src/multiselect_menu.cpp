@@ -414,7 +414,7 @@ namespace playground {
             const int value = IsHorizontal()
                                   ? boxes_[selected()].x_min - box_.x_min
                                   : boxes_[selected()].y_min - box_.y_min;
-            return float(value);
+            return static_cast<float>(value);
         }
 
         float SecondTarget() {
@@ -424,7 +424,7 @@ namespace playground {
             const int value = IsHorizontal()
                                   ? boxes_[selected()].x_max - box_.x_min
                                   : boxes_[selected()].y_max - box_.y_min;
-            return float(value);
+            return static_cast<float>(value);
         }
 
     protected:
