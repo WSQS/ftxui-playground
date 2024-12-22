@@ -15,6 +15,61 @@
 using namespace ftxui;
 
 namespace playground {
+    struct UnderlineOption {
+        bool enabled = false;
+
+        Color color_active = Color::White;
+        Color color_inactive = Color::GrayDark;
+
+        animation::easing::Function leader_function =
+            animation::easing::QuadraticInOut;
+        animation::easing::Function follower_function =
+            animation::easing::QuadraticInOut;
+
+        animation::Duration leader_duration = std::chrono::milliseconds(250);
+        animation::Duration leader_delay = std::chrono::milliseconds(0);
+        animation::Duration follower_duration = std::chrono::milliseconds(250);
+        animation::Duration follower_delay = std::chrono::milliseconds(0);
+
+        void SetAnimation(animation::Duration d, animation::easing::Function f);
+        void SetAnimationDuration(animation::Duration d);
+        void SetAnimationFunction(animation::easing::Function f);
+        void SetAnimationFunction(animation::easing::Function f_leader,
+                                  animation::easing::Function f_follower);
+    };
+    /// @brief Option for the Menu component.
+    /// @ingroup component
+    struct MenuOption {
+        // Standard constructors:
+        static MenuOption Horizontal();
+        static MenuOption HorizontalAnimated();
+        static MenuOption Vertical();
+        static MenuOption VerticalAnimated();
+        static MenuOption Toggle();
+
+        std::variant<ConstStringListRef,std::vector<std::string*>*> entries;  ///> The list of entries.
+        Ref<int> selected = 0;       ///> The index of the selected entry.
+
+        // Style:
+        UnderlineOption underline;
+        MenuEntryOption entries_option;
+        Direction direction = Direction::Down;
+        std::function<Element()> elements_prefix;
+        std::function<Element()> elements_infix;
+        std::function<Element()> elements_postfix;
+
+        // Observers:
+        std::function<void()> on_change;  ///> Called when the selected entry changes.
+        std::function<void()> on_enter;   ///> Called when the user presses enter.
+        Ref<int> focused_entry = 0;
+    };
+    Component enhanced_menu(MenuOption options);
+    Component enhanced_menu(ConstStringListRef entries,
+                   int* selected_,
+                   playground::MenuOption options = MenuOption::Vertical());
+    Component MenuEntry(MenuEntryOption options);
+    Component MenuEntry(ConstStringRef label, MenuEntryOption options = {});
+
     struct menu_data {
         Ref<std::vector<std::string> > entries{};
         std::shared_ptr<int> selected{};
@@ -26,12 +81,12 @@ namespace playground {
         int selected = 1;
     };
 
-    auto &get_screen() {
+    inline auto &get_screen() {
         static auto screen = ScreenInteractive::Fullscreen();
         return screen;
     }
 
-    void log(std::string log_message) {
+    inline void log(std::string log_message) {
         get_screen().PostEvent(Event::Special("log" + log_message));
     }
 
@@ -110,7 +165,7 @@ namespace playground {
             check_parent_sign(input_data);
             handel_file_type(input_data);
         };
-        return Menu(&*input_path_data->menu.entries, input_path_data->menu.selected.get(),
+        return enhanced_menu(&*input_path_data->menu.entries, input_path_data->menu.selected.get(),
                     menu_option);
     }
 
@@ -180,6 +235,7 @@ namespace playground {
         }
         return data;
     }
+
 }
 
 
