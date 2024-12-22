@@ -7,15 +7,12 @@
 #include <filesystem>
 #include <thread>
 #include <vector>
+
 #include "enhanced_menu.h"
 #include "ftxui/component/component.hpp"
-#include "ftxui/component/component_base.hpp"
-#include "ftxui/component/event.hpp"
 #include "ftxui/component/screen_interactive.hpp"
-using namespace ftxui;
 
 namespace playground {
-
     struct menu_data {
         Ref<std::vector<std::string> > entries{};
         std::shared_ptr<int> selected{};

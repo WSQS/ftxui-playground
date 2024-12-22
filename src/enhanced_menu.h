@@ -5,9 +5,7 @@
 #ifndef ENHANCED_MENU_H
 #define ENHANCED_MENU_H
 #include "ftxui/component/component.hpp"
-#include "ftxui/component/component_base.hpp"
-#include "ftxui/component/event.hpp"
-#include "ftxui/component/screen_interactive.hpp"
+
 using namespace ftxui;
 namespace playground {
 struct enhanced_menu_option {

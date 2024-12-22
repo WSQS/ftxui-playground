@@ -4,6 +4,8 @@
 
 #include "enhanced_menu.h"
 
+#include "ftxui/component/event.hpp"
+
 namespace playground {
         Element DefaultOptionTransform(const EntryState &state) {
         std::string label = (state.active ? "> " : "  ") + state.label; // NOLINT
