@@ -37,6 +37,7 @@ namespace playground {
         }
 
         void OnEnter() {
+            toggled->clear();
             if (on_enter) {
                 on_enter();
             }
