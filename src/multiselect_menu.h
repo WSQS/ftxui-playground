@@ -5,8 +5,11 @@
 #ifndef MULTISELECT_MENU_H
 #define MULTISELECT_MENU_H
 
+#include <set>
+
 #include "ftxui/component/component.hpp"
 using namespace ftxui;
+
 namespace playground {
     struct multiselect_menu_option {
         // Standard constructors:
@@ -29,9 +32,7 @@ namespace playground {
             option.elements_infix = [] { return text(" "); };
 
             return option;
-        };
-
-        static multiselect_menu_option HorizontalAnimated();
+        }
 
         static multiselect_menu_option Vertical() {
             multiselect_menu_option option;
@@ -49,9 +50,7 @@ namespace playground {
                 return e;
             };
             return option;
-        };
-
-        static multiselect_menu_option VerticalAnimated();
+        }
 
         std::variant<ConstStringListRef, std::vector<std::string *> *> entries; ///> The list of entries.
         Ref<int> selected = 0; ///> The index of the selected entry.
@@ -73,10 +72,9 @@ namespace playground {
     Component multiselect_menu(multiselect_menu_option options);
 
     Component multiselect_menu(ConstStringListRef entries,
-                            int *selected_,
-                            multiselect_menu_option options = multiselect_menu_option::Vertical());
+                               int *selected_,
+                               multiselect_menu_option options = multiselect_menu_option::Vertical());
 }
-
 
 
 #endif //MULTISELECT_MENU_H
