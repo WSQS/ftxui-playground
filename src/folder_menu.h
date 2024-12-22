@@ -15,8 +15,6 @@
 using namespace ftxui;
 
 namespace playground {
-    /// @brief Option for the Menu component.
-    /// @ingroup component
     struct enhanced_menu_option {
         // Standard constructors:
         static enhanced_menu_option Horizontal() {
@@ -91,9 +89,9 @@ namespace playground {
                             int *selected_,
                             playground::enhanced_menu_option options = enhanced_menu_option::Vertical());
 
-    Component MenuEntry(MenuEntryOption options);
+    Component Toggle(ConstStringListRef entries, int *selected);
 
-    Component MenuEntry(ConstStringRef label, MenuEntryOption options = {});
+    Component Toggle(std::vector<std::string *> *entries, int *selected);
 
     struct menu_data {
         Ref<std::vector<std::string> > entries{};
@@ -111,7 +109,7 @@ namespace playground {
         return screen;
     }
 
-    inline void log(const std::string& log_message) {
+    inline void log(const std::string &log_message) {
         get_screen().PostEvent(Event::Special("log" + log_message));
     }
 
@@ -260,6 +258,7 @@ namespace playground {
         }
         return data;
     }
+
     inline auto add_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container) {
         auto input_data = Make<path_data>(path_data{
             "/home", {{{".."}}, {Make<int>()}}
@@ -268,7 +267,8 @@ namespace playground {
         tab_container->Add(FileMenu(input_data));
     }
 
-    inline auto remove_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container, int index) {
+    inline auto remove_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas, Component &tab_container,
+                                   int index) {
         if (path_datas.empty()) {
             log("There is not tab anymore");
             return;

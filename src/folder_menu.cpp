@@ -473,8 +473,8 @@ namespace playground {
 
         int size() const {
             return static_cast<int>(std::holds_alternative<ConstStringListRef>(entries)
-                       ? std::get<ConstStringListRef>(entries).size()
-                       : std::get<std::vector<std::string *> *>(entries)->size());
+                                        ? std::get<ConstStringListRef>(entries).size()
+                                        : std::get<std::vector<std::string *> *>(entries)->size());
         }
 
         float FirstTarget() {
@@ -602,5 +602,4 @@ namespace playground {
         option.selected = selected;
         return enhanced_menu(option);
     }
-
 } // namespace ftxui
