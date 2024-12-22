@@ -516,86 +516,21 @@ namespace playground {
         std::vector<float> animation_foreground_;
     };
 
-    /// @brief A list of text. The focused element is selected.
-    /// @param option a structure containing all the paramters.
-    /// @ingroup component
-    ///
-    /// ### Example
-    ///
-    /// ```cpp
-    /// auto screen = ScreenInteractive::TerminalOutput();
-    /// std::vector<std::string> entries = {
-    ///     "entry 1",
-    ///     "entry 2",
-    ///     "entry 3",
-    /// };
-    /// int selected = 0;
-    /// auto menu = Menu({
-    ///   .entries = &entries,
-    ///   .selected = &selected,
-    /// });
-    /// screen.Loop(menu);
-    /// ```
-    ///
-    /// ### Output
-    ///
-    /// ```bash
-    /// > entry 1
-    ///   entry 2
-    ///   entry 3
-    /// ```
     // NOLINTNEXTLINE
     Component enhanced_menu(enhanced_menu_option option) {
         return Make<enhanced_menu_base>(std::move(option));
     }
 
-    /// @brief A list of text. The focused element is selected.
-    /// @param entries The list of entries in the menu.
-    /// @param selected The index of the currently selected element.
-    /// @param option Additional optional parameters.
-    /// @ingroup component
-    ///
-    /// ### Example
-    ///
-    /// ```cpp
-    /// auto screen = ScreenInteractive::TerminalOutput();
-    /// std::vector<std::string> entries = {
-    ///     "entry 1",
-    ///     "entry 2",
-    ///     "entry 3",
-    /// };
-    /// int selected = 0;
-    /// auto menu = Menu(&entries, &selected);
-    /// screen.Loop(menu);
-    /// ```
-    ///
-    /// ### Output
-    ///
-    /// ```bash
-    /// > entry 1
-    ///   entry 2
-    ///   entry 3
-    /// ```
     Component enhanced_menu(ConstStringListRef entries, int *selected, enhanced_menu_option option) {
         option.entries = std::move(entries);
         option.selected = selected;
         return enhanced_menu(option);
     }
 
-    /// @brief An horizontal list of elements. The user can navigate through them.
-    /// @param entries The list of selectable entries to display.
-    /// @param selected Reference the selected entry.
-    /// See also |Menu|.
-    /// @ingroup component
     Component Toggle(ConstStringListRef entries, int *selected) {
         return enhanced_menu(std::move(entries), selected, enhanced_menu_option::Toggle());
     }
 
-    /// @brief An horizontal list of elements. The user can navigate through them.
-    /// @param entries The list of selectable entries to display.
-    /// @param selected Reference the selected entry.
-    /// See also |Menu|.
-    /// @ingroup component
     Component Toggle(std::vector<std::string *> *entries, int *selected) {
         auto option = enhanced_menu_option::Toggle();
         option.entries = std::move(entries);
