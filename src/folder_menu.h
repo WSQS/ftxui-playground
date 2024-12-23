@@ -39,18 +39,18 @@ namespace playground {
         }
     }
 
+    inline auto get_parent_directory(std::string &file_path) {
+        std::filesystem::path temp_directory{file_path};
+        temp_directory = temp_directory.append("..").lexically_normal();
+        file_path = temp_directory.string();
+    };
+
     inline auto get_directory_content(const std::shared_ptr<path_data> &input_path_data) {
         input_path_data->menu.entries.clear();
         check_parent_sign(input_path_data);
         for (const auto &entry: std::filesystem::directory_iterator(input_path_data->file_path)) {
             input_path_data->menu.entries.emplace_back(entry.path().filename().string());
         }
-    };
-
-    inline auto get_parent_directory(const std::shared_ptr<path_data> &input_path_data) {
-        std::filesystem::path temp_directory{input_path_data->file_path};
-        temp_directory = temp_directory.append("..").lexically_normal();
-        input_path_data->file_path = temp_directory.string();
     };
 
     inline auto run_command(const std::shared_ptr<path_data> &input_path_data) {
@@ -64,7 +64,7 @@ namespace playground {
 
     inline auto handel_file(const std::shared_ptr<path_data> &input_path_data) {
         run_command(input_path_data);
-        get_parent_directory(input_path_data);
+        get_parent_directory(input_path_data->file_path);
         get_directory_content(input_path_data);
     };
 
