@@ -41,6 +41,7 @@ namespace playground {
     }
 
     inline auto get_directory_content(const std::shared_ptr<path_data> &input_path_data) {
+        check_parent_sign(input_path_data);
         for (const auto &entry: std::filesystem::directory_iterator(input_path_data->file_path)) {
             input_path_data->menu.entries.emplace_back(entry.path().filename().string());
         }
@@ -176,11 +177,11 @@ namespace playground {
         std::shared_ptr<path_data> input_data;
         if (path_datas.empty())
             input_data = Make<path_data>(path_data{
-                "/home", {{{{".."}}}, {Make<int>()}}
+                "/home", {{}, {Make<int>()}}
             });
         else
             input_data = Make<path_data>(path_data{
-                path_datas[index]->file_path, {{{{".."}}}, {Make<int>()}}
+                path_datas[index]->file_path, {{}, {Make<int>()}}
             });
         path_datas.push_back(input_data);
         tab_container->Add(FileMenu(input_data));
