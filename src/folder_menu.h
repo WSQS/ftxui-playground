@@ -33,10 +33,10 @@ namespace playground {
             input_path_data->menu.entries.emplace_back("..");
     }
 
-    inline auto handle_path_existence(const std::shared_ptr<path_data> &input_path_data) {
-        if (!std::filesystem::exists(input_path_data->file_path)) {
-            log("Unavailable path:" + input_path_data->file_path);
-            input_path_data->file_path = "/";
+    inline auto handle_path_existence(std::string &file_path) {
+        if (!std::filesystem::exists(file_path)) {
+            log("Unavailable path:" + file_path);
+            file_path = "/";
         }
     }
 
@@ -93,7 +93,7 @@ namespace playground {
         multiselect_menu_option menu_option{multiselect_menu_option::Vertical()};
         // handel menu enter
         menu_option.on_enter = [input_data=input_path_data]() {
-            handle_path_existence(input_data);
+            handle_path_existence(input_data->file_path);
             std::filesystem::path directory{input_data->file_path};
             directory = directory.append(input_data->menu.entries[*input_data->menu.selected]()).
                     lexically_normal();
@@ -125,7 +125,7 @@ namespace playground {
         InputOption input_option{};
         input_option.multiline = false;
         input_option.on_enter = [input_data=input_path_data]() mutable {
-            handle_path_existence(input_data);
+            handle_path_existence(input_data->file_path);
             check_parent_sign(input_data);
             std::filesystem::path directory{input_data->file_path};
             handel_file_type(input_data);
