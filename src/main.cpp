@@ -7,7 +7,7 @@ using namespace playground;
 int main() {
     std::vector<std::shared_ptr<path_data> > path_datas;
     int select = 0;
-    std::vector<std::string *> tab_values{};
+    std::vector<reference<std::string>> tab_values{};
     auto tab_container = Container::Tab({}, &select);
     add_folder_menu(path_datas, tab_container, select);
     add_folder_menu(path_datas, tab_container, select);

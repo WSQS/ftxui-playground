@@ -5,7 +5,7 @@
 #ifndef ENHANCED_MENU_H
 #define ENHANCED_MENU_H
 #include "ftxui/component/component.hpp"
-
+#include "reference.h"
 using namespace ftxui;
 
 namespace playground {
@@ -60,7 +60,7 @@ namespace playground {
             return option;
         };
 
-        std::variant<ConstStringListRef, std::vector<std::string *> *> entries; ///> The list of entries.
+        Ref<std::vector<reference<std::string>>> entries; ///> The list of entries.
         Ref<int> selected = 0; ///> The index of the selected entry.
 
         // Style:
@@ -79,13 +79,11 @@ namespace playground {
 
     Component enhanced_menu(enhanced_menu_option options);
 
-    Component enhanced_menu(ConstStringListRef entries,
+    Component enhanced_menu(Ref<std::vector<reference<std::string>>> entries,
                             int *selected_,
                             enhanced_menu_option options = enhanced_menu_option::Vertical());
 
-    Component Toggle(ConstStringListRef entries, int *selected);
-
-    Component Toggle(std::vector<std::string *> *entries, int *selected);
+    Component Toggle(Ref<std::vector<reference<std::string>>> entries, int *selected);
 } // playground
 
 #endif //ENHANCED_MENU_H

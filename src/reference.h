@@ -25,7 +25,7 @@ public:
     reference(T t) : value(std::move(t)) {
     }
 
-    reference(const T *t) : value(t) {
+    reference(T *t) : value(t) {
     }
 
     reference(std::shared_ptr<T> t) : value(t) {

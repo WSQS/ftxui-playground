@@ -8,30 +8,40 @@
 #include "menu_util.h"
 #include "ftxui/component/event.hpp"
 
-namespace playground {
+namespace playground
+{
     /// @brief A list of items. The user can navigate through them.
     /// @ingroup component
-    class enhanced_menu_base : public ComponentBase, public enhanced_menu_option {
+    class enhanced_menu_base : public ComponentBase, public enhanced_menu_option
+    {
     public:
-        explicit enhanced_menu_base(const enhanced_menu_option &option) : enhanced_menu_option(option) {
+        explicit enhanced_menu_base(const enhanced_menu_option& option) : enhanced_menu_option(
+            option)
+        {
         }
 
         bool IsHorizontal() { return playground::IsHorizontal(direction); }
 
-        void OnChange() {
-            if (on_change) {
+        void OnChange()
+        {
+            if (on_change)
+            {
                 on_change();
             }
         }
 
-        void OnEnter() {
-            if (on_enter) {
+        void OnEnter()
+        {
+            if (on_enter)
+            {
                 on_enter();
             }
         }
 
-        void Clamp() {
-            if (selected() != selected_previous_) {
+        void Clamp()
+        {
+            if (selected() != selected_previous_)
+            {
                 SelectedTakeFocus();
             }
             boxes_.resize(size());
@@ -41,197 +51,232 @@ namespace playground {
             focused_entry() = clamp(focused_entry(), 0, size() - 1);
         }
 
-        void OnAnimation(animation::Params &params) override {
+        void OnAnimation(animation::Params& params) override
+        {
             animator_first_.OnAnimation(params);
             animator_second_.OnAnimation(params);
-            for (auto &animator: animator_background_) {
+            for (auto& animator : animator_background_)
+            {
                 animator.OnAnimation(params);
             }
-            for (auto &animator: animator_foreground_) {
+            for (auto& animator : animator_foreground_)
+            {
                 animator.OnAnimation(params);
             }
         }
 
-        Element Render() override {
+        Element Render() override
+        {
             Clamp();
             UpdateAnimationTarget();
 
             Elements elements;
             const bool is_menu_focused = Focused();
-            if (elements_prefix) {
+            if (elements_prefix)
+            {
                 elements.push_back(elements_prefix());
             }
             elements.reserve(size());
-            for (int i = 0; i < size(); ++i) {
-                if (i != 0 && elements_infix) {
+            for (int i = 0; i < size(); ++i)
+            {
+                if (i != 0 && elements_infix)
+                {
                     elements.push_back(elements_infix());
                 }
                 const bool is_focused = (focused_entry() == i) && is_menu_focused;
                 const bool is_selected = (selected() == i);
 
                 const EntryState state = {
-                    std::holds_alternative<ConstStringListRef>(entries)
-                        ? std::get<ConstStringListRef>(entries)[i]
-                        : *(*std::get<std::vector<std::string *> *>(entries))[i],
+                    entries()[i](),
                     false, is_selected, is_focused, i,
                 };
 
                 auto focus_management = (selected_focus_ != i)
                                             ? nothing
                                             : is_menu_focused
-                                                  ? focus
-                                                  : ftxui::select;
+                                            ? focus
+                                            : ftxui::select;
 
                 const Element element =
-                        (entries_option.transform
-                             ? entries_option.transform
-                             : DefaultOptionTransform) //
-                        (state);
+                    (entries_option.transform
+                         ? entries_option.transform
+                         : DefaultOptionTransform) //
+                    (state);
                 elements.push_back(element | AnimatedColorStyle(i) | reflect(boxes_[i]) |
-                                   focus_management);
+                    focus_management);
             }
-            if (elements_postfix) {
+            if (elements_postfix)
+            {
                 elements.push_back(elements_postfix());
             }
 
-            if (IsInverted(direction)) {
+            if (IsInverted(direction))
+            {
                 std::reverse(elements.begin(), elements.end());
             }
 
             const Element bar =
-                    IsHorizontal() ? hbox(std::move(elements)) : vbox(std::move(elements));
+                IsHorizontal() ? hbox(std::move(elements)) : vbox(std::move(elements));
 
-            if (!underline.enabled) {
+            if (!underline.enabled)
+            {
                 return bar | reflect(box_);
             }
 
-            if (IsHorizontal()) {
+            if (IsHorizontal())
+            {
                 return vbox({
-                           bar | xflex,
-                           separatorHSelector(first_, second_, //
-                                              underline.color_active,
-                                              underline.color_inactive),
-                       }) |
-                       reflect(box_);
-            } else {
+                        bar | xflex,
+                        separatorHSelector(first_, second_, //
+                                           underline.color_active,
+                                           underline.color_inactive),
+                    }) |
+                    reflect(box_);
+            }
+            else
+            {
                 return hbox({
-                           separatorVSelector(first_, second_, //
-                                              underline.color_active,
-                                              underline.color_inactive),
-                           bar | yflex,
-                       }) |
-                       reflect(box_);
+                        separatorVSelector(first_, second_, //
+                                           underline.color_active,
+                                           underline.color_inactive),
+                        bar | yflex,
+                    }) |
+                    reflect(box_);
             }
         }
 
-        void SelectedTakeFocus() {
+        void SelectedTakeFocus()
+        {
             selected_previous_ = selected();
             selected_focus_ = selected();
         }
 
-        void OnUp() {
-            switch (direction) {
-                case Direction::Up:
-                    selected()++;
-                    break;
-                case Direction::Down:
-                    selected()--;
-                    break;
-                case Direction::Left:
-                case Direction::Right:
-                    break;
+        void OnUp()
+        {
+            switch (direction)
+            {
+            case Direction::Up:
+                selected()++;
+                break;
+            case Direction::Down:
+                selected()--;
+                break;
+            case Direction::Left:
+            case Direction::Right:
+                break;
             }
         }
 
-        void OnDown() {
-            switch (direction) {
-                case Direction::Up:
-                    selected()--;
-                    break;
-                case Direction::Down:
-                    selected()++;
-                    break;
-                case Direction::Left:
-                case Direction::Right:
-                    break;
+        void OnDown()
+        {
+            switch (direction)
+            {
+            case Direction::Up:
+                selected()--;
+                break;
+            case Direction::Down:
+                selected()++;
+                break;
+            case Direction::Left:
+            case Direction::Right:
+                break;
             }
         }
 
-        void OnLeft() {
-            switch (direction) {
-                case Direction::Left:
-                    selected()++;
-                    break;
-                case Direction::Right:
-                    selected()--;
-                    break;
-                case Direction::Down:
-                case Direction::Up:
-                    break;
+        void OnLeft()
+        {
+            switch (direction)
+            {
+            case Direction::Left:
+                selected()++;
+                break;
+            case Direction::Right:
+                selected()--;
+                break;
+            case Direction::Down:
+            case Direction::Up:
+                break;
             }
         }
 
-        void OnRight() {
-            switch (direction) {
-                case Direction::Left:
-                    selected()--;
-                    break;
-                case Direction::Right:
-                    selected()++;
-                    break;
-                case Direction::Down:
-                case Direction::Up:
-                    break;
+        void OnRight()
+        {
+            switch (direction)
+            {
+            case Direction::Left:
+                selected()--;
+                break;
+            case Direction::Right:
+                selected()++;
+                break;
+            case Direction::Down:
+            case Direction::Up:
+                break;
             }
         }
 
         // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-        bool OnEvent(Event event) override {
+        bool OnEvent(Event event) override
+        {
             Clamp();
-            if (!CaptureMouse(event)) {
+            if (!CaptureMouse(event))
+            {
                 return false;
             }
 
-            if (event.is_mouse()) {
+            if (event.is_mouse())
+            {
                 return OnMouseEvent(event);
             }
 
-            if (Focused()) {
+            if (Focused())
+            {
                 const int old_selected = selected();
-                if (event == Event::ArrowUp || event == Event::Character('k')) {
+                if (event == Event::ArrowUp || event == Event::Character('k'))
+                {
                     OnUp();
                 }
-                if (event == Event::ArrowDown || event == Event::Character('j')) {
+                if (event == Event::ArrowDown || event == Event::Character('j'))
+                {
                     OnDown();
                 }
-                if (event == Event::ArrowLeft || event == Event::Character('h')) {
+                if (event == Event::ArrowLeft || event == Event::Character('h'))
+                {
                     OnLeft();
                 }
-                if (event == Event::ArrowRight || event == Event::Character('l')) {
+                if (event == Event::ArrowRight || event == Event::Character('l'))
+                {
                     OnRight();
                 }
-                if (event == Event::PageUp) {
+                if (event == Event::PageUp)
+                {
                     selected() -= box_.y_max - box_.y_min;
                 }
-                if (event == Event::PageDown) {
+                if (event == Event::PageDown)
+                {
                     selected() += box_.y_max - box_.y_min;
                 }
-                if (event == Event::Home) {
+                if (event == Event::Home)
+                {
                     selected() = 0;
                 }
-                if (event == Event::End) {
+                if (event == Event::End)
+                {
                     selected() = size() - 1;
                 }
-                if (event == Event::Tab && size()) {
+                if (event == Event::Tab && size())
+                {
                     selected() = (selected() + 1) % size();
                 }
-                if (event == Event::TabReverse && size()) {
+                if (event == Event::TabReverse && size())
+                {
                     selected() = (selected() + size() - 1) % size();
                 }
 
                 selected() = clamp(selected(), 0, size() - 1);
 
-                if (selected() != old_selected) {
+                if (selected() != old_selected)
+                {
                     focused_entry() = selected();
                     SelectedTakeFocus();
                     OnChange();
@@ -239,7 +284,8 @@ namespace playground {
                 }
             }
 
-            if (event == Event::Return) {
+            if (event == Event::Return)
+            {
                 OnEnter();
                 return true;
             }
@@ -247,21 +293,27 @@ namespace playground {
             return false;
         }
 
-        bool OnMouseEvent(Event event) {
+        bool OnMouseEvent(Event event)
+        {
             if (event.mouse().button == Mouse::WheelDown ||
-                event.mouse().button == Mouse::WheelUp) {
+                event.mouse().button == Mouse::WheelUp)
+            {
                 return OnMouseWheel(event);
             }
 
             if (event.mouse().button != Mouse::None &&
-                event.mouse().button != Mouse::Left) {
+                event.mouse().button != Mouse::Left)
+            {
                 return false;
             }
-            if (!CaptureMouse(event)) {
+            if (!CaptureMouse(event))
+            {
                 return false;
             }
-            for (int i = 0; i < size(); ++i) {
-                if (!boxes_[i].Contain(event.mouse().x, event.mouse().y)) {
+            for (int i = 0; i < size(); ++i)
+            {
+                if (!boxes_[i].Contain(event.mouse().x, event.mouse().y))
+                {
                     continue;
                 }
 
@@ -269,8 +321,10 @@ namespace playground {
                 focused_entry() = i;
 
                 if (event.mouse().button == Mouse::Left &&
-                    event.mouse().motion == Mouse::Pressed) {
-                    if (selected() != i) {
+                    event.mouse().motion == Mouse::Pressed)
+                {
+                    if (selected() != i)
+                    {
                         selected() = i;
                         selected_previous_ = selected();
                         OnChange();
@@ -281,35 +335,43 @@ namespace playground {
             return false;
         }
 
-        bool OnMouseWheel(Event event) {
-            if (!box_.Contain(event.mouse().x, event.mouse().y)) {
+        bool OnMouseWheel(Event event)
+        {
+            if (!box_.Contain(event.mouse().x, event.mouse().y))
+            {
                 return false;
             }
             const int old_selected = selected();
 
-            if (event.mouse().button == Mouse::WheelUp) {
+            if (event.mouse().button == Mouse::WheelUp)
+            {
                 selected()--;
             }
-            if (event.mouse().button == Mouse::WheelDown) {
+            if (event.mouse().button == Mouse::WheelDown)
+            {
                 selected()++;
             }
 
             selected() = clamp(selected(), 0, size() - 1);
 
-            if (selected() != old_selected) {
+            if (selected() != old_selected)
+            {
                 SelectedTakeFocus();
                 OnChange();
             }
             return true;
         }
 
-        void UpdateAnimationTarget() {
+        void UpdateAnimationTarget()
+        {
             UpdateColorTarget();
             UpdateUnderlineTarget();
         }
 
-        void UpdateColorTarget() {
-            if (size() != int(animation_background_.size())) {
+        void UpdateColorTarget()
+        {
+            if (size() != int(animation_background_.size()))
+            {
                 animation_background_.resize(size());
                 animation_foreground_.resize(size());
                 animator_background_.clear();
@@ -318,7 +380,8 @@ namespace playground {
                 const int len = size();
                 animator_background_.reserve(len);
                 animator_foreground_.reserve(len);
-                for (int i = 0; i < len; ++i) {
+                for (int i = 0; i < len; ++i)
+                {
                     animation_background_[i] = 0.F;
                     animation_foreground_[i] = 0.F;
                     animator_background_.emplace_back(&animation_background_[i], 0.F,
@@ -331,11 +394,13 @@ namespace playground {
             }
 
             const bool is_menu_focused = Focused();
-            for (int i = 0; i < size(); ++i) {
+            for (int i = 0; i < size(); ++i)
+            {
                 const bool is_focused = (focused_entry() == i) && is_menu_focused;
                 const bool is_selected = (selected() == i);
                 float target = is_selected ? 1.F : is_focused ? 0.5F : 0.F; // NOLINT
-                if (animator_background_[i].to() != target) {
+                if (animator_background_[i].to() != target)
+                {
                     animator_background_[i] = animation::Animator(
                         &animation_background_[i], target,
                         entries_option.animated_colors.background.duration,
@@ -348,35 +413,42 @@ namespace playground {
             }
         }
 
-        Decorator AnimatedColorStyle(int i) {
+        Decorator AnimatedColorStyle(int i)
+        {
             Decorator style = nothing;
-            if (entries_option.animated_colors.foreground.enabled) {
+            if (entries_option.animated_colors.foreground.enabled)
+            {
                 style = style | color(Color::Interpolate(
-                            animation_foreground_[i],
-                            entries_option.animated_colors.foreground.inactive,
-                            entries_option.animated_colors.foreground.active));
+                    animation_foreground_[i],
+                    entries_option.animated_colors.foreground.inactive,
+                    entries_option.animated_colors.foreground.active));
             }
 
-            if (entries_option.animated_colors.background.enabled) {
+            if (entries_option.animated_colors.background.enabled)
+            {
                 style = style | bgcolor(Color::Interpolate(
-                            animation_background_[i],
-                            entries_option.animated_colors.background.inactive,
-                            entries_option.animated_colors.background.active));
+                    animation_background_[i],
+                    entries_option.animated_colors.background.inactive,
+                    entries_option.animated_colors.background.active));
             }
             return style;
         }
 
-        void UpdateUnderlineTarget() {
-            if (!underline.enabled) {
+        void UpdateUnderlineTarget()
+        {
+            if (!underline.enabled)
+            {
                 return;
             }
 
             if (FirstTarget() == animator_first_.to() &&
-                SecondTarget() == animator_second_.to()) {
+                SecondTarget() == animator_second_.to())
+            {
                 return;
             }
 
-            if (FirstTarget() >= animator_first_.to()) {
+            if (FirstTarget() >= animator_first_.to())
+            {
                 animator_first_ = animation::Animator(
                     &first_, FirstTarget(), underline.follower_duration,
                     underline.follower_function, underline.follower_delay);
@@ -384,7 +456,9 @@ namespace playground {
                 animator_second_ = animation::Animator(
                     &second_, SecondTarget(), underline.leader_duration,
                     underline.leader_function, underline.leader_delay);
-            } else {
+            }
+            else
+            {
                 animator_first_ = animation::Animator(
                     &first_, FirstTarget(), underline.leader_duration,
                     underline.leader_function, underline.leader_delay);
@@ -395,20 +469,20 @@ namespace playground {
             }
         }
 
-        bool Focusable() const final {
-            return std::holds_alternative<ConstStringListRef>(entries)
-                       ? std::get<ConstStringListRef>(entries).size()
-                       : std::get<std::vector<std::string *> *>(entries)->size();
+        bool Focusable() const final
+        {
+            return entries->size();
         }
 
-        int size() const {
-            return static_cast<int>(std::holds_alternative<ConstStringListRef>(entries)
-                                        ? std::get<ConstStringListRef>(entries).size()
-                                        : std::get<std::vector<std::string *> *>(entries)->size());
+        int size() const
+        {
+            return static_cast<int>(entries->size());
         }
 
-        float FirstTarget() {
-            if (boxes_.empty()) {
+        float FirstTarget()
+        {
+            if (boxes_.empty())
+            {
                 return 0.F;
             }
             const int value = IsHorizontal()
@@ -417,8 +491,10 @@ namespace playground {
             return float(value);
         }
 
-        float SecondTarget() {
-            if (boxes_.empty()) {
+        float SecondTarget()
+        {
+            if (boxes_.empty())
+            {
                 return 0.F;
             }
             const int value = IsHorizontal()
@@ -447,21 +523,21 @@ namespace playground {
     };
 
     // NOLINTNEXTLINE
-    Component enhanced_menu(enhanced_menu_option option) {
+    Component enhanced_menu(enhanced_menu_option option)
+    {
         return Make<enhanced_menu_base>(std::move(option));
     }
 
-    Component enhanced_menu(ConstStringListRef entries, int *selected, enhanced_menu_option option) {
+    Component enhanced_menu(Ref<std::vector<reference<std::string>>> entries, int* selected,
+                            enhanced_menu_option option)
+    {
         option.entries = std::move(entries);
         option.selected = selected;
         return enhanced_menu(option);
     }
 
-    Component Toggle(ConstStringListRef entries, int *selected) {
-        return enhanced_menu(std::move(entries), selected, enhanced_menu_option::Toggle());
-    }
-
-    Component Toggle(std::vector<std::string *> *entries, int *selected) {
+    Component Toggle(Ref<std::vector<reference<std::string>>> entries, int* selected)
+    {
         auto option = enhanced_menu_option::Toggle();
         option.entries = std::move(entries);
         option.selected = selected;

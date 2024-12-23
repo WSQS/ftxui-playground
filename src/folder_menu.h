@@ -164,9 +164,9 @@ namespace playground {
     }
 
     inline auto build_tab_value(std::vector<std::shared_ptr<path_data> > &path_datas) {
-        std::vector<std::string *> data;
+        std::vector<reference<std::string>> data;
         for (const auto &path_data: path_datas) {
-            data.push_back(&path_data->file_path);
+            data.emplace_back(&path_data->file_path);
         }
         return data;
     }
