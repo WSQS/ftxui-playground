@@ -7,16 +7,13 @@ using namespace playground;
 int main() {
     std::vector<std::shared_ptr<path_data> > path_datas;
     int select = 0;
-    std::vector<reference<std::string>> tab_values{};
+    std::vector<reference<std::string> > tab_values{};
     auto tab_container = Container::Tab({}, &select);
     add_folder_menu(path_datas, tab_container, select);
     add_folder_menu(path_datas, tab_container, select);
     tab_values = build_tab_value(path_datas);
     auto tab_toggle = playground::Toggle(&tab_values, &select);
-    auto container = Container::Vertical({
-        tab_toggle,
-        tab_container,
-    });
+    auto container = Container::Vertical({tab_toggle, tab_container});
     std::string log{};
     auto renderer = Renderer(container, [&] {
         return vbox({
