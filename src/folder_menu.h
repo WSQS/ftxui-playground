@@ -25,6 +25,7 @@ namespace playground
     struct path_data
     {
         std::string file_path;
+        std::string tab_content;
         menu_data menu{};
         int selected = 1;
     };
@@ -71,12 +72,14 @@ namespace playground
         {
             input_path_data->menu.entries.emplace_back(entry.path().filename().string());
         }
+        input_path_data->tab_content = std::filesystem::path(input_path_data->file_path).filename().string();
     };
 
     inline auto handel_file(const std::shared_ptr<path_data>& input_path_data)
     {
         run_command(input_path_data->file_path);
         get_parent_directory(input_path_data->file_path);
+        input_path_data->tab_content = std::filesystem::path(input_path_data->file_path).filename().string();
         get_directory_content(input_path_data);
     };
 
@@ -115,6 +118,7 @@ namespace playground
             directory = directory.append(input_data->menu.entries[*input_data->menu.selected]()).
                                   lexically_normal();
             input_data->file_path = directory.string();
+            input_data->tab_content = directory.filename().string();
             handel_file_type(input_data);
         };
         return multiselect_menu(&input_path_data->menu.entries, input_path_data->menu.selected.get(),
@@ -151,6 +155,7 @@ namespace playground
         {
             handle_path_existence(input_data->file_path);
             std::filesystem::path directory{input_data->file_path};
+            input_data->tab_content = directory.filename().string();
             handel_file_type(input_data);
         };
         input_option.transform = input_transform;
@@ -197,7 +202,7 @@ namespace playground
         std::vector<reference<std::string>> data;
         for (const auto& path_data : path_datas)
         {
-            data.emplace_back(&path_data->file_path);
+            data.emplace_back(&path_data->tab_content);
         }
         return data;
     }
@@ -208,11 +213,11 @@ namespace playground
         std::shared_ptr<path_data> input_data;
         if (path_datas.empty())
             input_data = Make<path_data>(path_data{
-                "/home", {{}, {Make<int>()}}
+                "/home", {},{{}, {Make<int>()}}
             });
         else
             input_data = Make<path_data>(path_data{
-                path_datas[index]->file_path, {{}, {Make<int>()}}
+                path_datas[index]->file_path, {},{{}, {Make<int>()}}
             });
         path_datas.push_back(input_data);
         tab_container->Add(FileMenu(input_data));
