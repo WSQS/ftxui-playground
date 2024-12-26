@@ -24,6 +24,14 @@ FetchContent_Declare(ftxui
 )
 FetchContent_MakeAvailable(ftxui)
 # ------------------------------------------------------------------------------
+# --- Fetch Boost --------------------------------------------------------------
+FetchContent_Declare(
+        Boost
+        GIT_REPOSITORY https://github.com/boostorg/boost.git
+        GIT_TAG boost-1.87.0
+)
+FetchContent_MakeAvailable(Boost)
+# ------------------------------------------------------------------------------
 file(GLOB SOURCES "src/*.cpp")
 add_executable(ftxui-playground ${SOURCES})
 target_include_directories(ftxui-playground PRIVATE src)
