@@ -1,10 +1,61 @@
 #include <filesystem>
+#include <iostream>
+#include <unistd.h>
+#include <sys/wait.h>
 #include "folder_menu.h"
 
 using namespace ftxui;
 using namespace playground;
 
 int main() {
+    const char *command = "ls -l";
+    int pipefd[2];
+    if (pipe(pipefd) == -1) {
+        std::cerr << "pipe() failed!" << std::endl;
+        return 1;
+    }
+    pid_t pid = fork();
+    if (pid == -1) {
+        std::cerr << "fork() failed!" << std::endl;
+        return 1;
+    }
+    if (pid == 0) {
+        // 子进程
+        // 关闭管道的读端
+        close(pipefd[0]);
+
+        // 将标准输出重定向到管道的写端
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+
+        // 执行命令
+        execl("/bin/sh", "sh", "-c", command, nullptr);
+
+        // 如果 execl 失败
+        std::cerr << "execl() failed!" << std::endl;
+        _exit(1);
+    } else {
+        // 父进程
+        // 关闭管道的写端
+        close(pipefd[1]);
+
+        // 从管道的读端读取数据
+        char buffer[128];
+        std::string result;
+        ssize_t count;
+        while ((count = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
+            buffer[count] = '\0'; // 确保字符串以 null 结尾
+            result += buffer;
+        } // 关闭管道的读端
+        close(pipefd[0]);
+
+        // 等待子进程结束
+        wait(nullptr);
+
+        // 输出结果
+        std::cout << "Command output:\n" << result << std::endl;
+    }
+    return 0;
     std::vector<std::shared_ptr<path_data> > path_datas;
     int select = 0;
     std::vector<reference<std::string> > tab_values{};
