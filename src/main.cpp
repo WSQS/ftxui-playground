@@ -1,6 +1,5 @@
 #include <filesystem>
 #include <iostream>
-#include <sys/wait.h>
 #include "folder_menu.h"
 #include "boost/process.hpp"
 using namespace ftxui;
