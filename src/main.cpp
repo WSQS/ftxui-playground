@@ -1,23 +1,40 @@
 #include <filesystem>
 #include <iostream>
 #include "folder_menu.h"
-#include "boost/process.hpp"
+#include "boost/process/v2.hpp"
+#include "boost/asio.hpp"
 using namespace ftxui;
 using namespace playground;
 namespace bp = boost::process;
+namespace asio = boost::asio;
+using boost::system::error_code;
 int main() {
     // 执行命令并捕获输出
-    bp::ipstream is;
-    bp::child c("ls -l", bp::std_out > is);
+    // 创建 ASIO 执行上下文
+    asio::io_context io_context;
 
+    // 使用 popen 启动进程并连接其标准输出
+    asio::readable_pipe proc(io_context);
+    std::string command = "ls -l";
+    FILE* pipe = ::popen(command.c_str(), "r");
+    proc.assign(::fileno(pipe));
+
+    // 读取并处理输出
     std::string line;
-    // ignore first line
-    std::getline(is, line);
-    while (std::getline(is, line)) {
-        std::cout << line << std::endl;
+    error_code ec;
+
+    // 读取剩余行并打印
+    while (true) {
+        asio::read_until(proc, asio::dynamic_buffer(line), '\n', ec);
+        if (ec == asio::error::eof) {
+            break; // 读到文件末尾，退出循环
+        }
+        std::cout << line;
+        line.clear(); // 清空缓冲区以读取下一行
     }
 
-    c.wait();
+    // 关闭管道
+    ::pclose(pipe);
     return 0;
     std::vector<std::shared_ptr<path_data> > path_datas;
     int select = 0;
