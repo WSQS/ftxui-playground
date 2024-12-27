@@ -11,6 +11,8 @@ int main() {
     bp::child c("ls -l", bp::std_out > is);
 
     std::string line;
+    // ignore first line
+    std::getline(is, line);
     while (std::getline(is, line)) {
         std::cout << line << std::endl;
     }
