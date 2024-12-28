@@ -71,8 +71,8 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.c_compiler }}
-          path: ${{ github.workspace }}/build${{matrix.os == 'windows-latest' && '/Release' || '' }}/ftxui-playground${{matrix.os == 'windows-latest' && '.exe' || '' }}
+          name: ${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}
+          path: ${{ github.workspace }}/build/ftxui-playground
 
     #      - name: Test
     #        working-directory: ${{ steps.strings.outputs.build-output-dir }}
