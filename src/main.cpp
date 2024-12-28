@@ -26,7 +26,7 @@ int main() {
 
     // 读取剩余行并打印
     while (true) {
-        asio::read_until(proc, asio::dynamic_buffer(line), '\n', ec);
+        read_until(proc, asio::dynamic_buffer(line), '\n', ec);
         if (ec == asio::error::eof) {
             break; // 读到文件末尾，退出循环
         }
