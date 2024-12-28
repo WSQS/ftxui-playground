@@ -27,9 +27,9 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest ]
+        os: [ ubuntu-latest ]
         build_type: [ Release, Debug ]
-        c_compiler: [ gcc, clang]
+        c_compiler: [ gcc, clang ]
         include:
           - os: ubuntu-latest
             c_compiler: gcc
@@ -47,6 +47,12 @@ jobs:
         shell: bash
         run: |
           echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+      - name: Install Boost
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install libboost-all-dev -y
 
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
