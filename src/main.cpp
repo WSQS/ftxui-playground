@@ -42,7 +42,7 @@ auto get_directory_content(std::string path) {
         result.emplace_back(std::move(line));
     }
     pclose(pipe);
-    return std::move(result);
+    return result;
 }
 
 int main() {
