@@ -59,7 +59,6 @@ namespace playground {
         for (const auto &entry: std::filesystem::directory_iterator(input_path_data->file_path)) {
             input_path_data->menu.entries.emplace_back(entry.path().filename().string());
         }
-        input_path_data->tab_content = std::filesystem::path(input_path_data->file_path).filename().string();
     };
 
     inline auto handel_file(const std::shared_ptr<path_data> &input_path_data) {
