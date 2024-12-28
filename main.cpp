@@ -7,7 +7,7 @@ using namespace ftxui;
 using namespace playground;
 
 int main() {
-    auto result = ::get_directory_content("/");
+    auto result = filesystem::command::get_directory_content("/");
     std::vector<std::shared_ptr<path_data> > path_datas;
     int select = 0;
     std::vector<reference<std::string> > tab_values{};
