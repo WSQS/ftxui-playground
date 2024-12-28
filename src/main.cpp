@@ -17,8 +17,8 @@ int main() {
     // 使用 popen 启动进程并连接其标准输出
     asio::readable_pipe proc(io_context);
     std::string command = "ls -l";
-    FILE* pipe = ::popen(command.c_str(), "r");
-    proc.assign(::fileno(pipe));
+    FILE* pipe = popen(command.c_str(), "r");
+    proc.assign(fileno(pipe));
 
     // 读取并处理输出
     std::string line;
@@ -35,7 +35,7 @@ int main() {
     }
 
     // 关闭管道
-    ::pclose(pipe);
+    pclose(pipe);
     return 0;
     std::vector<std::shared_ptr<path_data> > path_datas;
     int select = 0;
