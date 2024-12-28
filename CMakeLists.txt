@@ -25,12 +25,18 @@ FetchContent_Declare(ftxui
 FetchContent_MakeAvailable(ftxui)
 # ------------------------------------------------------------------------------
 # --- Fetch Boost --------------------------------------------------------------
-FetchContent_Declare(
-        Boost
-        GIT_REPOSITORY https://github.com/boostorg/boost.git
-        GIT_TAG boost-1.87.0
-)
-FetchContent_MakeAvailable(Boost)
+#FetchContent_Declare(
+#        Boost
+#        GIT_REPOSITORY https://github.com/boostorg/boost.git
+#        GIT_TAG boost-1.87.0
+#)
+#FetchContent_MakeAvailable(Boost)
+find_package(Boost 1.83 REQUIRED COMPONENTS system filesystem)
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
+endif()
 # ------------------------------------------------------------------------------
 file(GLOB SOURCES "src/*.cpp")
 add_executable(ftxui-playground ${SOURCES})
@@ -40,7 +46,7 @@ target_link_libraries(ftxui-playground
         PRIVATE ftxui::screen
         PRIVATE ftxui::dom
         PRIVATE ftxui::component # Not needed for this example.
-        PRIVATE Boost::process
+        PRIVATE ${Boost_LIBRARIES}
 )
 
 set_target_properties(ftxui-playground PROPERTIES CXX_STANDARD 11)
