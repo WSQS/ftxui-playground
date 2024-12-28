@@ -17,11 +17,7 @@ namespace asio = boost::asio;
 using boost::system::error_code;
 
 int main() {
-    // 执行命令并捕获输出
-    // 创建 ASIO 执行上下文
     asio::io_context io_context;
-
-    // 使用 popen 启动进程并连接其标准输出
     asio::readable_pipe proc(io_context);
     std::string command = "ls -l";
     FILE *pipe = popen(command.c_str(), "r");
@@ -32,13 +28,18 @@ int main() {
         std::string line{};
         read_until(proc, asio::dynamic_buffer(line), '\n', ec);
         if (ec == asio::error::eof) {
-            break; // 读到文件末尾，退出循环
+            break;
         }
         result += line;
-        line.clear(); // 清空缓冲区以读取下一行
+        line.clear();
     }
-    std::cout << result << std::endl;
-    // 关闭管道
+    std::istringstream iss{result};
+    std::string line;
+    // remove first line for ls -l
+    std::getline(iss, line);
+    while (std::getline(iss, line)) {
+        std::cout << line << std::endl;
+    }
     pclose(pipe);
     return 0;
     std::vector<std::shared_ptr<path_data> > path_datas;
