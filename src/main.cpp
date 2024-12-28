@@ -1,4 +1,9 @@
 #include <cstdio>
+#ifdef _WIN32
+#include <stdio.h>
+#define popen _popen
+#define pclose _pclose
+#endif
 #include <filesystem>
 #include <iostream>
 
@@ -24,7 +29,6 @@ int main() {
     // 读取并处理输出
     std::string line;
     error_code ec;
-    read_until(proc, asio::dynamic_buffer(line), '\n', ec);
     line.clear();
     // 读取剩余行并打印
     while (true) {
