@@ -18,6 +18,12 @@ namespace playground {
     struct menu_data {
         std::vector<reference<std::string> > entries{};
         std::shared_ptr<int> selected{};
+        auto build_entries(const std::vector<std::string>& input_entries) {
+            entries.clear();
+            std::transform(input_entries.cbegin(), input_entries.cend(), std::back_inserter(entries), [](const auto &entry) {
+                return entry;
+            });
+        }
     };
 
     struct path_data {
@@ -36,9 +42,11 @@ namespace playground {
         commandThread.detach();
     }
 
-    inline auto check_parent_sign(const std::shared_ptr<path_data> &input_path_data) {
-        if (std::filesystem::path(input_path_data->file_path).root_directory() != input_path_data->file_path)
-            input_path_data->menu.entries.emplace_back("..");
+    inline auto check_parent_sign(const std::string &file_path) {
+        std::vector<std::string> result{};
+        if (std::filesystem::path(file_path).root_directory() != file_path)
+            result.emplace_back("..");
+        return result;
     }
 
     inline auto handle_path_existence(std::string &file_path) {
@@ -53,26 +61,26 @@ namespace playground {
         file_path = temp_directory.append("..").lexically_normal().string();
     };
 
-    inline auto get_directory_content(const std::shared_ptr<path_data> &input_path_data) {
-        input_path_data->menu.entries.clear();
-        check_parent_sign(input_path_data);
-        for (const auto &entry: std::filesystem::directory_iterator(input_path_data->file_path)) {
-            input_path_data->menu.entries.emplace_back(entry.path().filename().string());
+    inline auto get_directory_content(const std::string &file_path) {
+        auto result = check_parent_sign(file_path);
+        for (const auto &entry: std::filesystem::directory_iterator(file_path)) {
+            result.emplace_back(entry.path().filename().string());
         }
+        return result;
     };
 
     inline auto handel_file(const std::shared_ptr<path_data> &input_path_data) {
         run_command(input_path_data->file_path);
         get_parent_directory(input_path_data->file_path);
         input_path_data->tab_content = std::filesystem::path(input_path_data->file_path).filename().string();
-        get_directory_content(input_path_data);
+        input_path_data->menu.build_entries(get_directory_content(input_path_data->file_path));
     };
 
     inline auto handel_file_type(const std::shared_ptr<path_data> &input_path_data) {
         std::filesystem::path directory{input_path_data->file_path};
         switch (status(directory).type()) {
             case std::filesystem::file_type::directory:
-                get_directory_content(input_path_data);
+                input_path_data->menu.build_entries(get_directory_content(input_path_data->file_path));
                 break;
             case std::filesystem::file_type::regular:
                 handel_file(input_path_data);
@@ -150,7 +158,8 @@ namespace playground {
     }
 
     inline auto FileMenu(std::shared_ptr<path_data> &input_data) {
-        get_directory_content(input_data);
+        input_data->menu.build_entries(get_directory_content(input_data->file_path));
+        input_data->tab_content = std::filesystem::path(input_data->file_path).filename().string();
         auto menu = get_menu(input_data);
         auto input = get_input(input_data);
         auto container = Container::Vertical({input, menu}) | CatchEvent(handle_input);
