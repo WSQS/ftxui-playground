@@ -25,7 +25,7 @@ int main() {
     asio::readable_pipe proc(io_context);
     std::string command = "ls -l";
     FILE *pipe = popen(command.c_str(), "r");
-    proc.assign(fileno(pipe));
+    proc.assign(static_cast<asio::posix::stream_descriptor::native_handle_type>(fileno(pipe)));
     std::string result{};
     while (true) {
         error_code ec{};
