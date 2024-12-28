@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <filesystem>
 #include <iostream>
 
@@ -23,7 +24,8 @@ int main() {
     // 读取并处理输出
     std::string line;
     error_code ec;
-
+    read_until(proc, asio::dynamic_buffer(line), '\n', ec);
+    line.clear();
     // 读取剩余行并打印
     while (true) {
         read_until(proc, asio::dynamic_buffer(line), '\n', ec);
