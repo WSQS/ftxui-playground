@@ -15,6 +15,7 @@ using namespace playground;
 namespace bp = boost::process;
 namespace asio = boost::asio;
 using boost::system::error_code;
+
 int main() {
     // 执行命令并捕获输出
     // 创建 ASIO 执行上下文
@@ -23,23 +24,20 @@ int main() {
     // 使用 popen 启动进程并连接其标准输出
     asio::readable_pipe proc(io_context);
     std::string command = "ls -l";
-    FILE* pipe = popen(command.c_str(), "r");
+    FILE *pipe = popen(command.c_str(), "r");
     proc.assign(fileno(pipe));
-
-    // 读取并处理输出
-    std::string line;
-    error_code ec;
-    line.clear();
-    // 读取剩余行并打印
+    std::string result{};
     while (true) {
+        error_code ec{};
+        std::string line{};
         read_until(proc, asio::dynamic_buffer(line), '\n', ec);
         if (ec == asio::error::eof) {
             break; // 读到文件末尾，退出循环
         }
-        std::cout << line;
+        result += line;
         line.clear(); // 清空缓冲区以读取下一行
     }
-
+    std::cout << result << std::endl;
     // 关闭管道
     pclose(pipe);
     return 0;
