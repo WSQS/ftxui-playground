@@ -39,9 +39,8 @@ if(Boost_FOUND)
 endif()
 # ------------------------------------------------------------------------------
 file(GLOB SOURCES "src/*.cpp")
-add_executable(ftxui-playground ${SOURCES})
-target_include_directories(ftxui-playground PRIVATE src)
-
+add_executable(ftxui-playground ${SOURCES} "./main.cpp")
+target_include_directories(ftxui-playground PRIVATE include)
 target_link_libraries(ftxui-playground
         PRIVATE ftxui::screen
         PRIVATE ftxui::dom
