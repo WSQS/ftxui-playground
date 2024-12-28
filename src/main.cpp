@@ -1,9 +1,3 @@
-#include <cstdio>
-#ifdef _WIN32
-#include <stdio.h>
-#define popen _popen
-#define pclose _pclose
-#endif
 #include <filesystem>
 #include <iostream>
 
