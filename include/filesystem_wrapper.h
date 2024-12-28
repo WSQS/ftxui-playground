@@ -10,7 +10,7 @@ namespace bp = boost::process;
 namespace asio = boost::asio;
 using boost::system::error_code;
 
-auto execute(const std::string& command) {
+inline auto execute_once(const std::string& command) {
     asio::io_context io_context;
     asio::readable_pipe proc(io_context);
     FILE *pipe = popen(command.c_str(), "r");
@@ -31,7 +31,7 @@ auto execute(const std::string& command) {
 }
 
 inline auto get_directory_content(std::string path) {
-    std::istringstream iss{execute("ls -la "+path)};
+    std::istringstream iss{execute_once("ls -la "+path)};
     std::vector<std::string> result;
     // remove first line
     std::string line;
