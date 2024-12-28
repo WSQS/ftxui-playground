@@ -16,11 +16,11 @@ namespace bp = boost::process;
 namespace asio = boost::asio;
 using boost::system::error_code;
 
-auto get_directory_content() {
+auto get_directory_content(std::string path) {
     std::vector<std::string> result;
     asio::io_context io_context;
     asio::readable_pipe proc(io_context);
-    std::string command = "ls -l";
+    std::string command = "ls -la "+path;
     FILE *pipe = popen(command.c_str(), "r");
     proc.assign(fileno(pipe));
     std::string all_result{};
@@ -36,7 +36,7 @@ auto get_directory_content() {
     }
     std::istringstream iss{all_result};
     std::string line;
-    // remove first line for ls -l
+    // remove first line
     std::getline(iss, line);
     while (std::getline(iss, line)) {
         result.emplace_back(std::move(line));
@@ -46,7 +46,7 @@ auto get_directory_content() {
 }
 
 int main() {
-    auto result = get_directory_content();
+    auto result = get_directory_content("/");
     std::vector<std::shared_ptr<path_data> > path_datas;
     int select = 0;
     std::vector<reference<std::string> > tab_values{};
