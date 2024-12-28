@@ -50,8 +50,7 @@ namespace playground {
 
     inline auto get_parent_directory(std::string &file_path) {
         std::filesystem::path temp_directory{file_path};
-        temp_directory = temp_directory.append("..").lexically_normal();
-        file_path = temp_directory.string();
+        file_path = temp_directory.append("..").lexically_normal().string();
     };
 
     inline auto get_directory_content(const std::shared_ptr<path_data> &input_path_data) {
