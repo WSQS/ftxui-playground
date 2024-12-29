@@ -45,5 +45,8 @@ namespace filesystem {
             return result;
         }
     }
+
+    namespace stander {
+    }
 }
 #endif //FILESYSTEM_WRAPPER_H
