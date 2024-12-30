@@ -48,11 +48,11 @@ jobs:
         run: |
           echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-      - name: Install Boost
-        shell: bash
-        run: |
-          sudo apt update
-          sudo apt install libboost-all-dev -y
+      # - name: Install Boost
+      #   shell: bash
+      #   run: |
+      #     sudo apt update
+      #     sudo apt install libboost-all-dev -y
 
       - name: Cache build folder
         uses: actions/cache@v3
@@ -60,7 +60,7 @@ jobs:
           path: build
           key: cmake-build-$${{ matrix.build_type }}-${{ matrix.cpp_compiler }}-${{ hashFiles('CMakeLists.txt') }}
           restore-keys: |
-            cmake-build-$${{ matrix.build_type }}-${{ matrix.cpp_compiler }}
+            cmake-build-${{ matrix.build_type }}-${{ matrix.cpp_compiler }}
 
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
