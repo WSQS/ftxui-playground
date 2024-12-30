@@ -25,23 +25,23 @@ FetchContent_Declare(ftxui
 FetchContent_MakeAvailable(ftxui)
 # ------------------------------------------------------------------------------
 # --- Fetch Boost --------------------------------------------------------------
-find_package(Boost 1.83 QUIET COMPONENTS system filesystem)
+# find_package(Boost 1.83 QUIET COMPONENTS system filesystem)
+# 
+# message(STATUS "Boost found: ${Boost_FOUND}")
+# message(STATUS "Boost version: ${Boost_VERSION}")
+# message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
 
-message(STATUS "Boost found: ${Boost_FOUND}")
-message(STATUS "Boost version: ${Boost_VERSION}")
-message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
-
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    link_directories(${Boost_LIBRARY_DIRS})
-else ()
+# if(Boost_FOUND)
+#     include_directories(${Boost_INCLUDE_DIRS})
+#     link_directories(${Boost_LIBRARY_DIRS})
+# else ()
     FetchContent_Declare(
             Boost
             GIT_REPOSITORY https://github.com/boostorg/boost.git
             GIT_TAG boost-1.87.0
     )
     FetchContent_MakeAvailable(Boost)
-endif()
+# endif()
 # ------------------------------------------------------------------------------
 file(GLOB SOURCES "src/*.cpp")
 add_executable(ftxui-playground ${SOURCES} "./main.cpp")
