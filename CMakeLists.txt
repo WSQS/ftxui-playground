@@ -50,7 +50,7 @@ target_link_libraries(ftxui-playground
         PRIVATE ftxui::screen
         PRIVATE ftxui::dom
         PRIVATE ftxui::component # Not needed for this example.
-        PRIVATE Boost::process
+        PRIVATE Boost::system
 )
 
 set_target_properties(ftxui-playground PROPERTIES CXX_STANDARD 11)
