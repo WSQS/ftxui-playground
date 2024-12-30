@@ -25,7 +25,11 @@ FetchContent_Declare(ftxui
 FetchContent_MakeAvailable(ftxui)
 # ------------------------------------------------------------------------------
 # --- Fetch Boost --------------------------------------------------------------
-find_package(Boost 1.83 QUIET COMPONENTS process)
+find_package(Boost 1.83 QUIET COMPONENTS system filesystem)
+
+message(STATUS "Boost found: ${Boost_FOUND}")
+message(STATUS "Boost version: ${Boost_VERSION}")
+message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
