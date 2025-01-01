@@ -65,6 +65,8 @@ add_executable(
 target_link_libraries(
         hello_test
         GTest::gtest_main
+        PRIVATE Boost::asio
+        PRIVATE Boost::process
 )
 target_include_directories(hello_test PRIVATE include)
 gtest_discover_tests(hello_test)
