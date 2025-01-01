@@ -52,6 +52,7 @@ target_link_libraries(ftxui-playground
         PRIVATE ftxui::component # Not needed for this example.
         PRIVATE Boost::system
         PRIVATE Boost::filesystem
+        PRIVATE Boost::asio
 )
 
 set_target_properties(ftxui-playground PROPERTIES CXX_STANDARD 11)
