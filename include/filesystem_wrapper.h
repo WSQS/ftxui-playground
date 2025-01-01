@@ -34,12 +34,10 @@ namespace filesystem {
         }
 
         inline auto get_directory_content(std::string path) {
-            std::istringstream iss{execute_once("ls -la " + path)};
+            std::istringstream iss{execute_once("ls " + path)};
             std::vector<std::string> result;
-            // remove first line
             std::string line;
-            std::getline(iss, line);
-            while (std::getline(iss, line)) {
+            while (iss >> line) {
                 result.emplace_back(std::move(line));
             }
             return result;
