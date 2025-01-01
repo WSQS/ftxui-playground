@@ -54,6 +54,12 @@ jobs:
       #    sudo apt update
       #    sudo apt install libboost-all-dev -y
 
+      - name: Install Google Test
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install libgtest-dev -y
+
       - name: Cache build folder
         uses: actions/cache@v3
         with:
