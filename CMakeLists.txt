@@ -62,9 +62,8 @@ add_executable(
         hello_test
         ./test/hello_test.cc
 )
-target_link_libraries(
-        hello_test
-        GTest::gtest_main
+target_link_libraries(hello_test
+        PRIVATE GTest::gtest_main
         PRIVATE Boost::asio
         PRIVATE Boost::process
 )
