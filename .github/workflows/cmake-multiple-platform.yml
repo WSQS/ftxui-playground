@@ -121,5 +121,5 @@ jobs:
           script: |
             adb devices
             adb shell echo "Hello, Android Emulator!"
-            adb shell pm list packages
+            adb shell "ls -a /"
 
