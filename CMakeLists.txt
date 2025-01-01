@@ -66,6 +66,7 @@ target_link_libraries(
         hello_test
         GTest::gtest_main
 )
+target_include_directories(hello_test PRIVATE include)
 gtest_discover_tests(hello_test)
 # ------------------------------------------------------------------------------
 install(TARGETS ftxui-playground RUNTIME DESTINATION "bin")
