@@ -17,7 +17,7 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED OFF)
 set(FETCHCONTENT_QUIET OFF)
 
 FetchContent_Declare(ftxui
-        GIT_REPOSITORY https://githubfast.com/WSQS/FTXUI.git
+        GIT_REPOSITORY https://github.com/WSQS/FTXUI.git
         GIT_PROGRESS TRUE
         GIT_SHALLOW TRUE
         EXCLUDE_FROM_ALL
