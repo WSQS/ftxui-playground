@@ -17,7 +17,7 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED OFF)
 set(FETCHCONTENT_QUIET OFF)
 
 FetchContent_Declare(ftxui
-        GIT_REPOSITORY https://github.com/WSQS/FTXUI.git
+        GIT_REPOSITORY https://githubfast.com/WSQS/FTXUI.git
         GIT_PROGRESS TRUE
         GIT_SHALLOW TRUE
         EXCLUDE_FROM_ALL
@@ -25,23 +25,13 @@ FetchContent_Declare(ftxui
 FetchContent_MakeAvailable(ftxui)
 # ------------------------------------------------------------------------------
 # --- Fetch Boost --------------------------------------------------------------
-# find_package(Boost 1.83 QUIET COMPONENTS system filesystem)
-# 
-# message(STATUS "Boost found: ${Boost_FOUND}")
-# message(STATUS "Boost version: ${Boost_VERSION}")
-# message(STATUS "Boost libraries: ${Boost_LIBRARIES}")
 
-# if(Boost_FOUND)
-#     include_directories(${Boost_INCLUDE_DIRS})
-#     link_directories(${Boost_LIBRARY_DIRS})
-# else ()
-    FetchContent_Declare(
-            Boost
-            GIT_REPOSITORY https://github.com/boostorg/boost.git
-            GIT_TAG boost-1.87.0
-    )
-    FetchContent_MakeAvailable(Boost)
-# endif()
+FetchContent_Declare(
+        Boost
+        GIT_REPOSITORY https://github.com/boostorg/boost.git
+        GIT_TAG boost-1.87.0
+)
+FetchContent_MakeAvailable(Boost)
 # ------------------------------------------------------------------------------
 file(GLOB SOURCES "src/*.cpp")
 add_executable(ftxui-playground ${SOURCES} "./main.cpp")
@@ -50,9 +40,8 @@ target_link_libraries(ftxui-playground
         PRIVATE ftxui::screen
         PRIVATE ftxui::dom
         PRIVATE ftxui::component # Not needed for this example.
-        PRIVATE Boost::system
-        PRIVATE Boost::filesystem
         PRIVATE Boost::asio
+        PRIVATE Boost::process
 )
 
 set_target_properties(ftxui-playground PROPERTIES CXX_STANDARD 11)
