@@ -31,7 +31,6 @@ FetchContent_Declare(
         GIT_TAG boost-1.87.0
 )
 FetchContent_MakeAvailable(Boost)
-include(Boost)
 # ------------------------------------------------------------------------------
 # --- Fetch GoogleTest ---------------------------------------------------------
 find_package(GTest REQUIRED)
