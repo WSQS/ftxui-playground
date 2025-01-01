@@ -9,11 +9,12 @@
 #include <vector>
 
 #include "enhanced_menu.h"
+#include "filesystem_wrapper.h"
 #include "menu_util.h"
 #include "multiselect_menu.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
-
+using namespace filesystem::command;
 namespace playground {
     struct menu_data {
         std::vector<reference<std::string> > entries{};
@@ -42,13 +43,6 @@ namespace playground {
         commandThread.detach();
     }
 
-    inline auto check_parent_sign(const std::string &file_path) {
-        std::vector<std::string> result{};
-        if (std::filesystem::path(file_path).root_directory() != file_path)
-            result.emplace_back("..");
-        return result;
-    }
-
     inline auto handle_path_existence(std::string &file_path) {
         if (!std::filesystem::exists(file_path)) {
             log("Unavailable path:" + file_path);
@@ -59,14 +53,6 @@ namespace playground {
     inline auto get_parent_directory(std::string &file_path) {
         std::filesystem::path temp_directory{file_path};
         file_path = temp_directory.append("..").lexically_normal().string();
-    };
-
-    inline auto get_directory_content(const std::string &file_path) {
-        auto result = check_parent_sign(file_path);
-        for (const auto &entry: std::filesystem::directory_iterator(file_path)) {
-            result.emplace_back(entry.path().filename().string());
-        }
-        return result;
     };
 
     inline auto handel_file(const std::shared_ptr<path_data> &input_path_data) {

@@ -5,6 +5,8 @@
 #ifndef FILESYSTEM_WRAPPER_H
 #define FILESYSTEM_WRAPPER_H
 
+#include <filesystem>
+
 #include "boost/asio.hpp"
 #include "boost/process/v2.hpp"
 namespace bp = boost::process;
@@ -33,11 +35,13 @@ namespace filesystem {
             return result;
         }
 
-        inline auto get_directory_content(std::string path) {
-            std::istringstream iss{execute_once("ls " + path)};
+        inline auto get_directory_content(const std::string& path) {
+            std::istringstream iss{execute_once("ls -a " + path)};
             std::vector<std::string> result;
             std::string line;
             while (iss >> line) {
+                if (line == ".")
+                    continue;
                 result.emplace_back(std::move(line));
             }
             return result;
@@ -45,6 +49,20 @@ namespace filesystem {
     }
 
     namespace stander {
+        inline auto check_parent_sign(const std::string &file_path) {
+            std::vector<std::string> result{};
+            if (std::filesystem::path(file_path).root_directory() != file_path)
+                result.emplace_back("..");
+            return result;
+        }
+
+        inline auto get_directory_content(const std::string &file_path) {
+            std::vector<std::string> result = {".."};
+            for (const auto &entry: std::filesystem::directory_iterator(file_path)) {
+                result.emplace_back(entry.path().filename().string());
+            }
+            return result;
+        };
     }
 }
 #endif //FILESYSTEM_WRAPPER_H
