@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-
+enable_testing()
 project(ftxui-playground
         LANGUAGES CXX
         VERSION 1.0.0
@@ -25,14 +25,21 @@ FetchContent_Declare(ftxui
 FetchContent_MakeAvailable(ftxui)
 # ------------------------------------------------------------------------------
 # --- Fetch Boost --------------------------------------------------------------
-
 FetchContent_Declare(
         Boost
         GIT_REPOSITORY https://github.com/boostorg/boost.git
         GIT_TAG boost-1.87.0
 )
 FetchContent_MakeAvailable(Boost)
+include(Boost)
 # ------------------------------------------------------------------------------
+# --- Fetch GoogleTest ---------------------------------------------------------
+find_package(GTest REQUIRED)
+message(STATUS "GTest found: ${GTest_FOUND}")
+message(STATUS "GTest version: ${GTest_VERSION}")
+include(GoogleTest)
+# ------------------------------------------------------------------------------
+# --- Main Program -------------------------------------------------------------
 file(GLOB SOURCES "src/*.cpp")
 add_executable(ftxui-playground ${SOURCES} "./main.cpp")
 target_include_directories(ftxui-playground PRIVATE include)
@@ -50,5 +57,16 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 else ()
     target_compile_options(ftxui-playground PRIVATE -Wall -Wextra -pedantic -Wno-error)
 endif ()
-
+# ------------------------------------------------------------------------------
+# --- Test ---------------------------------------------------------------------
+add_executable(
+        hello_test
+        ./test/hello_test.cc
+)
+target_link_libraries(
+        hello_test
+        GTest::gtest_main
+)
+gtest_discover_tests(hello_test)
+# ------------------------------------------------------------------------------
 install(TARGETS ftxui-playground RUNTIME DESTINATION "bin")
