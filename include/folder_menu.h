@@ -17,7 +17,7 @@
 using namespace filesystem::command;
 namespace playground {
 struct menu_data {
-    std::vector<reference<std::string> > entries{};
+    std::vector<reference<std::string>> entries{};
     std::shared_ptr<int> selected{};
     auto build_entries(const std::vector<std::string> &input_entries) {
         entries.clear();
@@ -153,14 +153,14 @@ inline auto FileMenu(std::shared_ptr<path_data> &input_data) {
     });
 }
 
-inline auto build_tab_value(std::vector<std::shared_ptr<path_data> > &path_datas) {
-    std::vector<reference<std::string> > data;
+inline auto build_tab_value(std::vector<std::shared_ptr<path_data>> &path_datas) {
+    std::vector<reference<std::string>> data;
     for (const auto &path_data : path_datas)
         data.emplace_back(&path_data->tab_content);
     return data;
 }
 
-inline auto add_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas,
+inline auto add_folder_menu(std::vector<std::shared_ptr<path_data>> &path_datas,
                             Component &tab_container, int index) {
     std::shared_ptr<path_data> input_data;
     if (path_datas.empty()) {
@@ -173,7 +173,7 @@ inline auto add_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas
     tab_container->Add(FileMenu(input_data));
 }
 
-inline auto remove_folder_menu(std::vector<std::shared_ptr<path_data> > &path_datas,
+inline auto remove_folder_menu(std::vector<std::shared_ptr<path_data>> &path_datas,
                                Component &tab_container, int index) {
     if (path_datas.empty()) {
         log("There is not tab anymore");
