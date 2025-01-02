@@ -63,6 +63,12 @@ namespace filesystem {
             }
             return result;
         };
+
+        inline auto exists(const std::string & path)
+        {
+            return std::filesystem::exists(path);
+        }
+
     }
 }
 #endif //FILESYSTEM_WRAPPER_H

@@ -14,7 +14,7 @@
 #include "multiselect_menu.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
-using namespace filesystem::command;
+using namespace filesystem::stander;
 namespace playground {
     struct menu_data {
         std::vector<reference<std::string> > entries{};
@@ -44,7 +44,7 @@ namespace playground {
     }
 
     inline auto handle_path_existence(std::string &file_path) {
-        if (!std::filesystem::exists(file_path)) {
+        if (!exists(file_path)) {
             log("Unavailable path:" + file_path);
             file_path = "/";
         }
