@@ -14,7 +14,7 @@
 #include "multiselect_menu.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
-using namespace filesystem::stander;
+using namespace filesystem::command;
 namespace playground {
     struct menu_data {
         std::vector<reference<std::string> > entries{};

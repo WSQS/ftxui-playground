@@ -45,6 +45,7 @@ inline auto get_directory_content(const std::string &path) {
     }
     return result;
 }
+inline auto exists(const std::string &path) { return std::system(("test -e " + path).c_str()); }
 } // namespace command
 
 namespace stander {
