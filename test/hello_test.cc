@@ -26,9 +26,6 @@ TEST(filesystem, get_directory_content) {
 TEST(filesystem, not_exists) {
     EXPECT_EQ(filesystem::command::exists("/123"), false);
     EXPECT_EQ(filesystem::stander::exists("/123"), false);
-}
-
-TEST(filesystem, exists) {
     EXPECT_EQ(filesystem::command::exists("/mnt"), true);
     EXPECT_EQ(filesystem::stander::exists("/mnt"), true);
 }
