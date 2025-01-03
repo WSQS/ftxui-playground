@@ -45,7 +45,9 @@ inline auto get_directory_content(const std::string &path) {
     }
     return result;
 }
-inline auto exists(const std::string &path) { return std::system(("test -e " + path).c_str()) == 0; }
+inline auto exists(const std::string &path) {
+    return std::system(("test -e " + path).c_str()) == 0;
+}
 } // namespace command
 
 namespace stander {
@@ -61,9 +63,14 @@ inline auto get_directory_content(const std::string &file_path) {
     for (const auto &entry : std::filesystem::directory_iterator(file_path))
         result.emplace_back(entry.path().filename().string());
     return result;
-};
+}
 
 inline auto exists(const std::string &path) { return std::filesystem::exists(path); }
+
+inline auto get_parent_directory(std::string &file_path) {
+    std::filesystem::path temp_directory{file_path};
+    file_path = temp_directory.append("..").lexically_normal().string();
+}
 
 } // namespace stander
 } // namespace filesystem

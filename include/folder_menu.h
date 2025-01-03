@@ -14,7 +14,7 @@
 #include "ftxui/component/screen_interactive.hpp"
 #include "menu_util.h"
 #include "multiselect_menu.h"
-using namespace filesystem::command;
+using namespace filesystem::stander;
 namespace playground {
 struct menu_data {
     std::vector<reference<std::string>> entries{};
@@ -46,18 +46,13 @@ inline auto handle_path_existence(std::string &file_path) {
     }
 }
 
-inline auto get_parent_directory(std::string &file_path) {
-    std::filesystem::path temp_directory{file_path};
-    file_path = temp_directory.append("..").lexically_normal().string();
-};
-
 inline auto handel_file(const std::shared_ptr<path_data> &input_path_data) {
     run_command(input_path_data->file_path);
     get_parent_directory(input_path_data->file_path);
     input_path_data->tab_content =
         std::filesystem::path(input_path_data->file_path).filename().string();
     input_path_data->menu.build_entries(get_directory_content(input_path_data->file_path));
-};
+}
 
 inline auto handel_file_type(const std::shared_ptr<path_data> &input_path_data) {
     std::filesystem::path directory{input_path_data->file_path};
@@ -71,14 +66,14 @@ inline auto handel_file_type(const std::shared_ptr<path_data> &input_path_data) 
     default:
         log("Unsupported file type");
     }
-};
+}
 
 inline auto build_log(const std::string &log) {
     if (log.size() != 0)
         return text(log) | border;
     else
         return std::make_shared<Node>();
-};
+}
 
 inline auto get_menu(const std::shared_ptr<path_data> &input_path_data) {
     multiselect_menu_option menu_option{multiselect_menu_option::Vertical()};
@@ -107,7 +102,7 @@ inline auto input_transform(InputState state) {
     if (state.hovered)
         state.element |= bgcolor(Color::GrayDark);
     return state.element;
-};
+}
 
 inline auto get_input(const std::shared_ptr<path_data> &input_path_data) {
     InputOption input_option{};

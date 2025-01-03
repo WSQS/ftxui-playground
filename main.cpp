@@ -1,6 +1,3 @@
-#include <filesystem>
-#include <iostream>
-
 #include "folder_menu.h"
 using namespace ftxui;
 using namespace playground;
