@@ -48,12 +48,6 @@ jobs:
         run: |
           echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-      #- name: Install Boost
-      #  shell: bash
-      #  run: |
-      #    sudo apt update
-      #    sudo apt install libboost-all-dev -y
-
       - name: Install Google Test
         shell: bash
         run: |
