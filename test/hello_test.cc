@@ -23,9 +23,18 @@ TEST(filesystem, get_directory_content) {
         EXPECT_EQ(command_set.count(file), 1);
 }
 
-TEST(filesystem, not_exists) {
+TEST(filesystem, exists) {
     EXPECT_EQ(filesystem::command::exists("/123"), false);
     EXPECT_EQ(filesystem::stander::exists("/123"), false);
     EXPECT_EQ(filesystem::command::exists("/mnt"), true);
     EXPECT_EQ(filesystem::stander::exists("/mnt"), true);
+}
+
+TEST(filesystem, get_parent_directory) {
+    std::string file_path = "/mnt";
+    filesystem::command::get_parent_directory(file_path);
+    EXPECT_EQ(file_path, "/");
+    file_path = "/mnt";
+    filesystem::stander::get_parent_directory(file_path);
+    EXPECT_EQ(file_path, "/");
 }

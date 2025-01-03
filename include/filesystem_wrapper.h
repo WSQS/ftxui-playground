@@ -52,6 +52,8 @@ inline auto exists(const std::string &path) {
 
 inline auto get_parent_directory(std::string &file_path) {
     file_path = execute_once("realpath $(dirname " + file_path + " )");
+    // remove the switch line character in the end
+    file_path.pop_back();
 }
 
 } // namespace command
