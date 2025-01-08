@@ -57,7 +57,7 @@ inline auto handle_path_existence(std::string &file_path) {
 inline auto handel_file(const std::shared_ptr<path_data> &input_path_data) {
     run_command(input_path_data->file_path);
     get_parent_directory(input_path_data->file_path);
-    input_path_data->tab_content = get_file_name(input_path_data->file_path);
+    input_path_data->update_tab_content();
     input_path_data->menu.build_entries(get_directory_content(input_path_data->file_path));
 }
 
