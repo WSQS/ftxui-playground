@@ -26,11 +26,18 @@ struct menu_data {
     }
 };
 
+    inline auto get_file_name(const std::string &file_path) {
+        return std::filesystem::path(file_path).filename().string();
+    }
+
 struct path_data {
     std::string file_path;
     std::string tab_content;
     menu_data menu{};
     int selected = 1;
+    void update_tab_content() {
+        tab_content = get_file_name(file_path);
+    }
 };
 
 inline auto run_command(const std::string &file_path) {
@@ -44,10 +51,6 @@ inline auto handle_path_existence(std::string &file_path) {
         log("Unavailable path:" + file_path);
         file_path = "/";
     }
-}
-
-inline auto get_file_name(const std::string &file_path) {
-    return std::filesystem::path(file_path).filename().string();
 }
 
 inline auto handel_file(const std::shared_ptr<path_data> &input_path_data) {
@@ -87,7 +90,7 @@ inline auto get_menu(const std::shared_ptr<path_data> &input_path_data) {
         directory = directory.append(input_data->menu.entries[*input_data->menu.selected]())
                         .lexically_normal();
         input_data->file_path = directory.string();
-        input_data->tab_content = get_file_name(input_data->file_path);
+        input_data->update_tab_content();
         handel_file_type(input_data);
     };
     return multiselect_menu(&input_path_data->menu.entries, input_path_data->menu.selected.get(),
@@ -113,7 +116,7 @@ inline auto get_input(const std::shared_ptr<path_data> &input_path_data) {
     input_option.on_enter = [input_data = input_path_data]() mutable {
         handle_path_existence(input_data->file_path);
         std::filesystem::path directory{input_data->file_path};
-        input_data->tab_content = get_file_name(input_data->file_path);
+        input_data->update_tab_content();
         handel_file_type(input_data);
     };
     input_option.transform = input_transform;
@@ -137,7 +140,7 @@ inline auto handle_input(const Event &event) {
 
 inline auto FileMenu(std::shared_ptr<path_data> &input_data) {
     input_data->menu.build_entries(get_directory_content(input_data->file_path));
-    input_data->tab_content = get_file_name(input_data->file_path);
+    input_data->update_tab_content();
     auto menu = get_menu(input_data);
     auto input = get_input(input_data);
     auto container = Container::Vertical({input, menu}) | CatchEvent(handle_input);
