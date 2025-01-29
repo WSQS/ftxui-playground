@@ -3,9 +3,9 @@ using namespace ftxui;
 using namespace playground;
 
 int main() {
-    std::vector<std::shared_ptr<path_data> > path_datas;
+    std::vector<std::shared_ptr<path_data>> path_datas;
     int select = 0;
-    std::vector<reference<std::string> > tab_values{};
+    std::vector<reference<std::string>> tab_values{};
     auto tab_container = Container::Tab({}, &select);
     add_folder_menu(path_datas, tab_container, select);
     add_folder_menu(path_datas, tab_container, select);
@@ -36,6 +36,9 @@ int main() {
             // move focus to the last tab
             select = static_cast<int>(tab_values.size()) - 1;
             return true;
+        }
+        if (event == Event::Character('q')) {
+            get_screen().Exit();
         }
         // handel log
         if (event.input().size() >= 3 && event.input().substr(0, 3) == "log") {
