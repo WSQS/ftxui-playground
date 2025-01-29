@@ -112,7 +112,6 @@ inline auto get_input(const std::shared_ptr<path_data> &input_path_data) {
     input_option.multiline = false;
     input_option.on_enter = [input_data = input_path_data]() mutable {
         handle_path_existence(input_data->file_path);
-        std::filesystem::path directory{input_data->file_path};
         input_data->update_tab_content();
         handel_file_type(input_data);
     };
