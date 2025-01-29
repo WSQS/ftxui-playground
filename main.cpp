@@ -18,7 +18,7 @@ int main() {
                    tab_toggle->Render(),
                    separator(),
                    tab_container->Render() | flex,
-                   build_log(log),
+                   build_box(log),
                }) | border;
     }) | CatchEvent([&](const Event &event) {
         // add tab

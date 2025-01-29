@@ -71,7 +71,7 @@ inline auto handel_file_type(const std::shared_ptr<path_data> &input_path_data) 
     }
 }
 
-inline auto build_log(const std::string &log) {
+inline auto build_box(const std::string &log) {
     if (log.empty())
         return std::make_shared<Node>();
     else
