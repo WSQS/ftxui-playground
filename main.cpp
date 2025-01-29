@@ -11,7 +11,8 @@ int main() {
     add_folder_menu(path_datas, tab_container, select);
     tab_values = build_tab_value(path_datas);
     auto tab_toggle = playground::Toggle(&tab_values, &select);
-    auto input = Input();
+    auto search_bar = Input();
+    bool enable_search = false;
     auto container_with_tab =
         Container::Vertical({tab_toggle, tab_container}) | CatchEvent([&](const Event &event) {
             // add tab
@@ -32,15 +33,14 @@ int main() {
             }
             return false;
         });
-
-    auto full = Container::Vertical({container_with_tab, input});
+    auto full = Container::Vertical({container_with_tab, search_bar});
     std::string log{};
     auto renderer = Renderer(full, [&] {
         return vbox({
                    tab_toggle->Render(),
                    separator(),
                    tab_container->Render() | flex,
-                   input->Render() | border,
+                   enable_search? search_bar->Render() | border:Make<Node>(),
                    build_box(log),
                }) |
                border;
@@ -48,7 +48,9 @@ int main() {
         if (event == Event::Character('q'))
             get_screen().Exit();
         if (event == Event::Character('/')) {
-            playground::log("searching");
+            // playground::log("searching");
+            enable_search = !enable_search;
+            search_bar->TakeFocus();
             return true;
         }
         // handel log
@@ -63,8 +65,6 @@ int main() {
 
     // auto screen = Screen::Create(Dimension::Full(), Dimension::Fit(document));
     // Render(screen, document);
-    //
-    // std::cout << screen.ToString() << '\0' << std::endl;
 
     get_screen().Loop(renderer);
     return EXIT_SUCCESS;
