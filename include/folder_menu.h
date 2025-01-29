@@ -72,10 +72,10 @@ inline auto handel_file_type(const std::shared_ptr<path_data> &input_path_data) 
 }
 
 inline auto build_log(const std::string &log) {
-    if (log.size() != 0)
-        return text(log) | border;
-    else
+    if (log.empty())
         return std::make_shared<Node>();
+    else
+        return text(log) | border;
 }
 
 inline auto get_menu(const std::shared_ptr<path_data> &input_path_data) {
