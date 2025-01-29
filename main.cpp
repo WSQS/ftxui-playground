@@ -11,34 +11,45 @@ int main() {
     add_folder_menu(path_datas, tab_container, select);
     tab_values = build_tab_value(path_datas);
     auto tab_toggle = playground::Toggle(&tab_values, &select);
-    auto container = Container::Vertical({tab_toggle, tab_container});
+    auto input = Input();
+    auto container_with_tab =
+        Container::Vertical({tab_toggle, tab_container}) | CatchEvent([&](const Event &event) {
+            // add tab
+            if (event == Event::Character('a')) {
+                add_folder_menu(path_datas, tab_container, select);
+                tab_values = build_tab_value(path_datas);
+                // move focus to the last tab
+                select = static_cast<int>(tab_values.size()) - 1;
+                return true;
+            }
+            // remove current tab
+            if (event == Event::Character('d')) {
+                remove_folder_menu(path_datas, tab_container, select);
+                tab_values = build_tab_value(path_datas);
+                // move focus to the last tab
+                select = static_cast<int>(tab_values.size()) - 1;
+                return true;
+            }
+            return false;
+        });
+
+    auto full = Container::Vertical({container_with_tab, input});
     std::string log{};
-    auto renderer = Renderer(container, [&] {
+    auto renderer = Renderer(full, [&] {
         return vbox({
                    tab_toggle->Render(),
                    separator(),
                    tab_container->Render() | flex,
+                   input->Render() | border,
                    build_box(log),
-               }) | border;
+               }) |
+               border;
     }) | CatchEvent([&](const Event &event) {
-        // add tab
-        if (event == Event::Character('a')) {
-            add_folder_menu(path_datas, tab_container, select);
-            tab_values = build_tab_value(path_datas);
-            // move focus to the last tab
-            select = static_cast<int>(tab_values.size()) - 1;
-            return true;
-        }
-        // remove current tab
-        if (event == Event::Character('d')) {
-            remove_folder_menu(path_datas, tab_container, select);
-            tab_values = build_tab_value(path_datas);
-            // move focus to the last tab
-            select = static_cast<int>(tab_values.size()) - 1;
-            return true;
-        }
-        if (event == Event::Character('q')) {
+        if (event == Event::Character('q'))
             get_screen().Exit();
+        if (event == Event::Character('/')) {
+            playground::log("searching");
+            return true;
         }
         // handel log
         if (event.input().size() >= 3 && event.input().substr(0, 3) == "log") {
