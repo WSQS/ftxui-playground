@@ -28,10 +28,6 @@ struct menu_data {
     }
 };
 
-inline auto get_file_name(const std::string &file_path) {
-    return std::filesystem::path(file_path).filename().string();
-}
-
 struct path_data {
     std::string file_path;
     std::string tab_content;

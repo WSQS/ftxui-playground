@@ -56,6 +56,13 @@ inline auto get_parent_directory(std::string &file_path) {
     file_path.pop_back();
 }
 
+inline auto get_file_name(const std::string &file_path) {
+    // remove the last character '\n'
+    auto result  = execute_once("basename " + file_path);
+    result.pop_back();
+    return result;
+}
+
 } // namespace command
 
 namespace stander {
@@ -78,6 +85,10 @@ inline auto exists(const std::string &path) { return std::filesystem::exists(pat
 inline auto get_parent_directory(std::string &file_path) {
     std::filesystem::path temp_directory{file_path};
     file_path = temp_directory.append("..").lexically_normal().string();
+}
+
+inline auto get_file_name(const std::string &file_path) {
+    return std::filesystem::path(file_path).filename().string();
 }
 
 } // namespace stander

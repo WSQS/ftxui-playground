@@ -38,3 +38,8 @@ TEST(filesystem, get_parent_directory) {
     filesystem::stander::get_parent_directory(file_path);
     EXPECT_EQ(file_path, "/");
 }
+
+TEST(filesystem, get_file_name) {
+    EXPECT_EQ(filesystem::command::get_file_name("/mnt"), std::string("mnt"));
+    EXPECT_EQ(filesystem::stander::get_file_name("/mnt"), std::string("mnt"));
+}
