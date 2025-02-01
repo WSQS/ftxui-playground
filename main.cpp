@@ -40,7 +40,7 @@ int main() {
                    tab_toggle->Render(),
                    separator(),
                    tab_container->Render() | flex,
-                   enable_search? search_bar->Render() | border:Make<Node>(),
+                   enable_search ? search_bar->Render() | border : Make<Node>(),
                    build_box(log),
                }) |
                border;

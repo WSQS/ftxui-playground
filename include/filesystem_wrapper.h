@@ -5,37 +5,89 @@
 #ifndef FILESYSTEM_WRAPPER_H
 #define FILESYSTEM_WRAPPER_H
 
-#include "boost/asio.hpp"
-#include "boost/process/v2.hpp"
+#include <algorithm> // transform
 #include <cstdlib>
+#include <cstring> // strerror
 #include <filesystem>
-namespace bp = boost::process;
-namespace asio = boost::asio;
-using boost::system::error_code;
+#include <iostream>
+#include <vector> // vector
+
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+// namespace bp = boost::process;
+// namespace asio = boost::asio;
+// using boost::system::error_code;
 
 namespace filesystem {
 namespace command {
-inline auto execute_once(const std::string &command) {
-    asio::io_context io_context;
-    asio::readable_pipe proc(io_context);
-    FILE *pipe = popen(command.c_str(), "r");
-    proc.assign(fileno(pipe));
-    std::string result{};
-    while (true) {
-        error_code ec{};
-        std::string line{};
-        read_until(proc, asio::dynamic_buffer(line), '\n', ec);
-        if (ec == asio::error::eof)
-            break;
-        result += line;
-        line.clear();
+inline auto execute_once(std::vector<std::string> input_args) -> std::string {
+    constexpr auto READ_END = 0;
+    constexpr auto WRITE_END = 1;
+    constexpr auto buffer_size = 1024;
+    int pipefd[2];
+    if (pipe(pipefd) < 0) {
+        std::cerr << "ERROR: pipe failed: " << strerror(errno) << std::endl;
+        return {};
     }
-    pclose(pipe);
+    auto pid = fork();
+    if (!pid) {
+        if (!dup2(pipefd[WRITE_END], STDOUT_FILENO)) {
+            std::cerr << "ERROR: dup2 failed:  " << strerror(errno) << std::endl;
+            return {};
+        }
+        close(pipefd[READ_END]);
+        // Build argv for execvp
+        std::vector<char *> args;
+        std::transform(input_args.begin(), input_args.end(), back_inserter(args),
+            [](std::string &s) { return s.data(); });
+        args.push_back(nullptr);
+        if (execvp(args.data()[0], args.data()) != 0) {
+            std::cerr << "ERROR: execvp failed: " << strerror(errno) << std::endl;
+            return {};
+        }
+    }
+    close(pipefd[WRITE_END]);
+    wait(nullptr);
+    std::string result;
+    while (true) {
+        char buffer[buffer_size];
+        auto size = read(pipefd[READ_END], buffer, sizeof(char) * buffer_size);
+        if (size < 0) {
+            std::cerr << "ERROR: read failed: " << strerror(errno) << std::endl;
+            return result;
+        }
+        if (size == 0)
+            break;
+        result.append(buffer);
+    }
+    close(pipefd[READ_END]);
     return result;
 }
+// #include "boost/asio.hpp"
+// #include "boost/process/v2.hpp"
+// inline auto execute_once(const std::string &command) {
+//     asio::io_context io_context;
+//     asio::readable_pipe proc(io_context);
+//     FILE *pipe = popen(command.c_str(), "r");
+//     proc.assign(fileno(pipe));
+//     std::string result{};
+//     while (true) {
+//         error_code ec{};
+//         std::string line{};
+//         read_until(proc, asio::dynamic_buffer(line), '\n', ec);
+//         if (ec == asio::error::eof)
+//             break;
+//         result += line;
+//         line.clear();
+//     }
+//     pclose(pipe);
+//     return result;
+// }
 
 inline auto get_directory_content(const std::string &path) {
-    std::istringstream iss{execute_once("ls -a " + path)};
+    std::istringstream iss{execute_once({"ls", "-a", path})};
     std::vector<std::string> result;
     std::string line;
     while (iss >> line) {
@@ -51,15 +103,17 @@ inline auto exists(const std::string &path) {
 }
 
 inline auto get_parent_directory(std::string &file_path) {
-    file_path = execute_once("realpath $(dirname " + file_path + " )");
+    file_path = execute_once({"realpath", execute_once({"dirname", file_path})});
     // remove the switch line character in the end
-    file_path.pop_back();
+    for (int i = 0; i < 6; i++)
+        file_path.pop_back();
 }
 
 inline auto get_file_name(const std::string &file_path) {
+    auto result = execute_once({"basename", file_path});
     // remove the last character '\n'
-    auto result  = execute_once("basename " + file_path);
-    result.pop_back();
+    for (int i = 0; i < 3; i++)
+        result.pop_back();
     return result;
 }
 

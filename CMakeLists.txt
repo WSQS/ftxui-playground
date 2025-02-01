@@ -24,14 +24,6 @@ FetchContent_Declare(ftxui
 )
 FetchContent_MakeAvailable(ftxui)
 # ------------------------------------------------------------------------------
-# --- Fetch Boost --------------------------------------------------------------
-FetchContent_Declare(
-        Boost
-        GIT_REPOSITORY https://github.com/boostorg/boost.git
-        GIT_TAG boost-1.87.0
-)
-FetchContent_MakeAvailable(Boost)
-# ------------------------------------------------------------------------------
 # --- Fetch GoogleTest ---------------------------------------------------------
 find_package(GTest REQUIRED)
 message(STATUS "GTest found: ${GTest_FOUND}")
@@ -46,8 +38,6 @@ target_link_libraries(ftxui-playground
         PRIVATE ftxui::screen
         PRIVATE ftxui::dom
         PRIVATE ftxui::component # Not needed for this example.
-        PRIVATE Boost::asio
-        PRIVATE Boost::process
 )
 
 set_target_properties(ftxui-playground PROPERTIES CXX_STANDARD 11)
@@ -64,8 +54,6 @@ add_executable(
 )
 target_link_libraries(hello_test
         PRIVATE GTest::gtest_main
-        PRIVATE Boost::asio
-        PRIVATE Boost::process
 )
 target_include_directories(hello_test PRIVATE include)
 gtest_discover_tests(hello_test)
