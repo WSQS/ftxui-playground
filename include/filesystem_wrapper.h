@@ -19,25 +19,74 @@
 // namespace bp = boost::process;
 // namespace asio = boost::asio;
 // using boost::system::error_code;
-
+using uint8 = uint_fast8_t;
+using int32 = int_fast32_t;
 namespace filesystem {
 namespace command {
-inline auto execute_once(std::vector<std::string> input_args) -> std::string {
-    constexpr auto READ_END = 0;
-    constexpr auto WRITE_END = 1;
-    constexpr auto buffer_size = 1024;
-    int pipefd[2];
-    if (pipe(pipefd) < 0) {
-        std::cerr << "ERROR: pipe failed: " << strerror(errno) << std::endl;
-        return {};
+class pipe_wrapper {
+    constexpr static auto READ_END = 0;
+    constexpr static auto WRITE_END = 1;
+    enum class pipe_statues : uint_fast8_t { available, read, write } statues{};
+    int pipe_des[2]{};
+    bool is_valid = true;
+
+public:
+    pipe_wrapper() {
+        auto pipe_result = pipe(pipe_des);
+        is_valid = pipe_result == 0;
+        if (!is_valid)
+            std::cerr << "ERROR: pipe failed: " << strerror(errno) << std::endl;
+        else
+            statues = pipe_statues::available;
     }
+    ~pipe_wrapper() {
+        switch (statues) {
+        case pipe_statues::available:
+            close(pipe_des[READ_END]);
+            close(pipe_des[WRITE_END]);
+            break;
+        case pipe_statues::read:
+            close(pipe_des[READ_END]);
+            break;
+        case pipe_statues::write:
+            close(pipe_des[WRITE_END]);
+            break;
+        default:
+            break;
+        }
+    }
+    bool valid() const { return is_valid; }
+    auto read_end() {
+        if (statues == pipe_statues::available) {
+            statues = pipe_statues::read;
+            close(pipe_des[WRITE_END]);
+        }
+        if (statues == pipe_statues::read)
+            return pipe_des[READ_END];
+        return -1;
+    }
+    auto write_end() {
+        if (statues == pipe_statues::available) {
+            statues = pipe_statues::write;
+            close(pipe_des[READ_END]);
+        }
+        if (statues == pipe_statues::write)
+            return pipe_des[WRITE_END];
+        return -1;
+    }
+};
+
+inline auto execute_once(std::vector<std::string> input_args) -> std::string {
+    constexpr auto buffer_size = 1024;
+    pipe_wrapper pipe_des{};
+    if (!pipe_des.valid())
+        return {};
     auto pid = fork();
     if (!pid) {
-        if (!dup2(pipefd[WRITE_END], STDOUT_FILENO)) {
+        if (!dup2(pipe_des.write_end(), STDOUT_FILENO)) {
             std::cerr << "ERROR: dup2 failed:  " << strerror(errno) << std::endl;
             return {};
         }
-        close(pipefd[READ_END]);
         // Build argv for execvp
         std::vector<char *> args;
         std::transform(input_args.begin(), input_args.end(), back_inserter(args),
@@ -48,12 +97,11 @@ inline auto execute_once(std::vector<std::string> input_args) -> std::string {
             return {};
         }
     }
-    close(pipefd[WRITE_END]);
     wait(nullptr);
     std::string result;
     while (true) {
         char buffer[buffer_size];
-        auto size = read(pipefd[READ_END], buffer, sizeof(char) * buffer_size);
+        const auto size = read(pipe_des.read_end(), buffer, sizeof(char) * buffer_size);
         if (size < 0) {
             std::cerr << "ERROR: read failed: " << strerror(errno) << std::endl;
             return result;
@@ -62,7 +110,6 @@ inline auto execute_once(std::vector<std::string> input_args) -> std::string {
             break;
         result.append(buffer, size);
     }
-    close(pipefd[READ_END]);
     return result;
 }
 
@@ -109,18 +156,16 @@ inline auto get_parent_directory(std::string &file_path) {
     file_path = execute_once({"realpath", execute_once({"dirname", file_path})});
     // remove the last character
     size_t pos = file_path.find('\n');
-    if (pos != std::string::npos) {
+    if (pos != std::string::npos)
         file_path.erase(pos);
-    }
 }
 
 inline auto get_file_name(const std::string &file_path) {
     auto result = execute_once({"basename", file_path});
     // remove the last character
     size_t pos = result.find('\n');
-    if (pos != std::string::npos) {
+    if (pos != std::string::npos)
         result.erase(pos);
-    }
     return result;
 }
 
