@@ -104,16 +104,22 @@ inline auto exists(const std::string &path) {
 
 inline auto get_parent_directory(std::string &file_path) {
     file_path = execute_once({"realpath", execute_once({"dirname", file_path})});
-    // remove the switch line character in the end
-    for (int i = 0; i < 6; i++)
-        file_path.pop_back();
+    // remove the last character
+    size_t pos = file_path.find('\n');
+    if (pos != std::string::npos) {
+        // 如果找到了换行符，截取到换行符之前的部分
+        file_path.erase(pos);
+    }
 }
 
 inline auto get_file_name(const std::string &file_path) {
     auto result = execute_once({"basename", file_path});
-    // remove the last character '\n'
-    for (int i = 0; i < 3; i++)
-        result.pop_back();
+    // remove the last character
+    size_t pos = result.find('\n');
+    if (pos != std::string::npos) {
+        // 如果找到了换行符，截取到换行符之前的部分
+        result.erase(pos);
+    }
     return result;
 }
 
