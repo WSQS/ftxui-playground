@@ -88,9 +88,6 @@ inline auto execute_once(std::vector<std::string> input_args) -> std::string {
 // }
 
 inline auto get_directory_content(const std::string &path) {
-    std::cout << "//" << std::endl
-              << execute_once({"ls", "-a", path}) << std::endl
-              << "//" << std::endl;
     std::istringstream iss{execute_once({"ls", "-a", path})};
     std::vector<std::string> result;
     std::string line;
@@ -109,18 +106,10 @@ inline auto exists(const std::string &path) {
 }
 
 inline auto get_parent_directory(std::string &file_path) {
-    file_path = execute_once({"dirname", file_path});
+    file_path = execute_once({"realpath", execute_once({"dirname", file_path})});
     // remove the last character
     size_t pos = file_path.find('\n');
     if (pos != std::string::npos) {
-        // 如果找到了换行符，截取到换行符之前的部分
-        file_path.erase(pos);
-    }
-    file_path = execute_once({"realpath", file_path});
-    // remove the last character
-    pos = file_path.find('\n');
-    if (pos != std::string::npos) {
-        // 如果找到了换行符，截取到换行符之前的部分
         file_path.erase(pos);
     }
 }
@@ -130,7 +119,6 @@ inline auto get_file_name(const std::string &file_path) {
     // remove the last character
     size_t pos = result.find('\n');
     if (pos != std::string::npos) {
-        // 如果找到了换行符，截取到换行符之前的部分
         result.erase(pos);
     }
     return result;
