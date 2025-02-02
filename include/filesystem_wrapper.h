@@ -26,18 +26,17 @@ namespace command {
 class pipe_wrapper {
     constexpr static auto READ_END = 0;
     constexpr static auto WRITE_END = 1;
-    enum class pipe_statues : uint_fast8_t { available, read, write } statues{};
+    enum class pipe_statues : uint_fast8_t { unavailable, available, read, write } statues{};
     int pipe_des[2]{};
-    bool is_valid = true;
 
 public:
     pipe_wrapper() {
-        auto pipe_result = pipe(pipe_des);
-        is_valid = pipe_result == 0;
-        if (!is_valid)
+        if (pipe(pipe_des)) {
             std::cerr << "ERROR: pipe failed: " << strerror(errno) << std::endl;
-        else
+            statues = pipe_statues::unavailable;
+        } else {
             statues = pipe_statues::available;
+        }
     }
     ~pipe_wrapper() {
         switch (statues) {
@@ -55,7 +54,7 @@ public:
             break;
         }
     }
-    bool valid() const { return is_valid; }
+    bool valid() const { return statues != pipe_statues::unavailable; }
     auto read_end() {
         if (statues == pipe_statues::available) {
             statues = pipe_statues::read;
