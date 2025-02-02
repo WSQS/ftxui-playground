@@ -14,7 +14,7 @@
 
 #include <sys/types.h>
 #include <sys/wait.h> // wait
-#include <unistd.h> // fork, dup, execvp
+#include <unistd.h>   // fork, dup, execvp
 
 // namespace bp = boost::process;
 // namespace asio = boost::asio;
@@ -60,7 +60,7 @@ inline auto execute_once(std::vector<std::string> input_args) -> std::string {
         }
         if (size == 0)
             break;
-        result.append(buffer);
+        result.append(buffer, size);
     }
     close(pipefd[READ_END]);
     return result;
@@ -88,7 +88,9 @@ inline auto execute_once(std::vector<std::string> input_args) -> std::string {
 // }
 
 inline auto get_directory_content(const std::string &path) {
-    std::cout << "//" << std::endl << execute_once({"ls", "-a", path}) << std::endl << "//" << std::endl;
+    std::cout << "//" << std::endl
+              << execute_once({"ls", "-a", path}) << std::endl
+              << "//" << std::endl;
     std::istringstream iss{execute_once({"ls", "-a", path})};
     std::vector<std::string> result;
     std::string line;
