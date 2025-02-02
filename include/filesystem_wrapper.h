@@ -13,8 +13,8 @@
 #include <vector> // vector
 
 #include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <sys/wait.h> // wait
+#include <unistd.h> // dup, execvp
 
 // namespace bp = boost::process;
 // namespace asio = boost::asio;
