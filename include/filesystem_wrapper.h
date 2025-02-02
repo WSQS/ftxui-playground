@@ -88,6 +88,7 @@ inline auto execute_once(std::vector<std::string> input_args) -> std::string {
 // }
 
 inline auto get_directory_content(const std::string &path) {
+    std::cout << "//" << std::endl << execute_once({"ls", "-a", path}) << std::endl << "//" << std::endl;
     std::istringstream iss{execute_once({"ls", "-a", path})};
     std::vector<std::string> result;
     std::string line;
