@@ -17,10 +17,7 @@ TEST(filesystem, get_directory_content) {
     EXPECT_EQ(command.size(), stander.size());
     std::set command_set(command.begin(), command.end());
     std::set stander_set(stander.begin(), stander.end());
-    for (auto file : command)
-        EXPECT_EQ(stander_set.count(file), 1);
-    for (auto file : stander)
-        EXPECT_EQ(command_set.count(file), 1);
+    EXPECT_EQ(command_set, stander_set);
 }
 
 TEST(filesystem, exists) {

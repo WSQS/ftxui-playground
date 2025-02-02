@@ -106,9 +106,16 @@ inline auto exists(const std::string &path) {
 }
 
 inline auto get_parent_directory(std::string &file_path) {
-    file_path = execute_once({"realpath", execute_once({"dirname", file_path})});
+    file_path = execute_once({"dirname", file_path});
     // remove the last character
     size_t pos = file_path.find('\n');
+    if (pos != std::string::npos) {
+        // 如果找到了换行符，截取到换行符之前的部分
+        file_path.erase(pos);
+    }
+    file_path = execute_once({"realpath", file_path});
+    // remove the last character
+    pos = file_path.find('\n');
     if (pos != std::string::npos) {
         // 如果找到了换行符，截取到换行符之前的部分
         file_path.erase(pos);
