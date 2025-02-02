@@ -44,7 +44,7 @@ set_target_properties(ftxui-playground PROPERTIES CXX_STANDARD 11)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(ftxui-playground PRIVATE /W4 /WX-)
 else ()
-    target_compile_options(ftxui-playground PRIVATE -Wall -Wextra -pedantic -Wno-error)
+    target_compile_options(ftxui-playground PRIVATE -Wall -Wextra -pedantic -Werror)
 endif ()
 # ------------------------------------------------------------------------------
 # --- Test ---------------------------------------------------------------------
