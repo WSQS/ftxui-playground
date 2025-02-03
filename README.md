@@ -1,31 +1,5 @@
-ftxui-starter
--------------
+# ftxui-playground
 
-[![Snap Status](https://build.snapcraft.io/badge/ArthurSonzogni/ftxui-starter.svg)](https://build.snapcraft.io/user/ArthurSonzogni/ftxui-starter)
+这是一个基于ftxui的用于文件管理的程序。
 
-[![Build Status](https://travis-ci.com/ArthurSonzogni/ftxui-starter.svg?branch=master)](https://travis-ci.com/ArthurSonzogni/ftxui-starter)
-
-Minimal starter project using the [FTXUI library](https://github.com/ArthurSonzogni/ftxui)
-
-
-# Build instructions:
-~~~bash
-mkdir build
-cd build
-cmake ..
-make -j
-cd ../target
-./ftxui-starter
-~~~
-
-## Webassembly build:
-~~~bash
-mkdir build_emscripten && cd build_emscripten
-emcmake cmake ..
-make -j
-./run_webassembly.py
-(visit localhost:8000)
-~~~
-
-## Linux snap build:
-Upload your game to github and visit https://snapcraft.io/build.
+目前正在添加当前文件夹下文件过滤的功能。为此需要考虑一下架构上的调整。需要将数据处理和渲染分隔开。
